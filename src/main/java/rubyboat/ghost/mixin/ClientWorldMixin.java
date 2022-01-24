@@ -1,0 +1,34 @@
+package rubyboat.ghost.mixin;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.BlockPos;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import rubyboat.ghost.client.GhostClient;
+
+@Environment(EnvType.CLIENT)
+@Mixin(ClientWorld.class)
+public abstract class ClientWorldMixin {
+    @Shadow @Final private MinecraftClient client;
+
+    @Shadow public abstract void setBlockStateWithoutNeighborUpdates(BlockPos pos, BlockState state);
+
+    @Inject(at = @At("HEAD"), method = "tick")
+    public void tick(CallbackInfo ci)
+    {
+        if(GhostClient.keyBinding.isPressed())
+        {
+            BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
+            this.setBlockStateWithoutNeighborUpdates(suggestedBlockpos, Blocks.BEDROCK.getDefaultState());
+        }
+    }
+}
