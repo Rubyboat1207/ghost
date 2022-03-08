@@ -1,0 +1,11 @@
+{
+  "category.ghost.general": "Ghost Keybinds",
+  "config.ghost.general": "Ghost Options",
+  "key.ghost.createghostblock": "Create Ghost block",
+  "key.ghost.menu": "Open Menu",
+  "title.ghost.config": "Ghostblock() Config",
+  "config_category.ghost.general": "General Options",
+  "config_category.ghost.experimental": "Experimental Options",
+  "entry.ghost.ghost_block": "Ghost block Block type",
+  "entry.ghost.is_slippery": "Frozen Mode"
+}

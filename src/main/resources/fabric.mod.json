@@ -9,7 +9,6 @@
   "license": "MIT",
   "icon": "assets/ghost/icon.png",
   "environment": "client",
-  "accessWidener" : "ghost.accesswidener",
   "entrypoints": {
     "client": [
       "rubyboat.ghost.client.GhostClient"

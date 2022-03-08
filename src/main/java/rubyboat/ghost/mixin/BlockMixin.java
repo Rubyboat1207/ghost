@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,15 +16,30 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import rubyboat.ghost.config.Config;
+
+import java.util.logging.Logger;
 
 @Environment(EnvType.CLIENT)
 @Mixin(Block.class)
 public class BlockMixin {
-    @Mutable
-
-    @Inject(at = @At("HEAD"), method = "onSteppedOn")
-    public void tick(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci)
+    @Inject(at = @At("HEAD"), method = "getSlipperiness", cancellable = true)
+    public void tick(CallbackInfoReturnable<Float> cir)
     {
-        ((Block)(Object)this).slipperiness = 0.98f;
+        if(Config.isSlippery())
+        {
+            if(MinecraftClient.getInstance().player != null)
+            {
+                if(MinecraftClient.getInstance().player.getVehicle() == null)
+                {
+                    cir.setReturnValue(1.001F);
+                }
+            }else
+            {
+                cir.setReturnValue(1.001F);
+            }
+
+        }
     }
 }
