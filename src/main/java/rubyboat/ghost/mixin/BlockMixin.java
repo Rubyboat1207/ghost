@@ -7,7 +7,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,6 +37,12 @@ public class BlockMixin {
                 {
                     cir.setReturnValue(1.001F);
                 }
+                if(MinecraftClient.getInstance().player.getVehicle() != null){
+                    if(MinecraftClient.getInstance().player.getVehicle().getType() == EntityType.PIG){
+                        cir.setReturnValue(1.001F);
+                    }
+                }
+
             }else
             {
                 cir.setReturnValue(1.001F);

@@ -8,7 +8,8 @@
     "CameraMixin",
     "ClientWorldMixin",
     "MinecraftClientMixin",
-    "PlayerRenderMixin"
+    "PlayerRenderMixin",
+    "EndPortalRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
