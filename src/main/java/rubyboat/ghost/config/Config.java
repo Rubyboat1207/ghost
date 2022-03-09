@@ -2,6 +2,7 @@ package rubyboat.ghost.config;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.ibm.icu.text.ArabicShaping;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -26,6 +27,7 @@ public class Config {
     static int camera_distance = 10;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
+    static boolean is_endtexture = false;
     public static String[] blocks = {
             "diamond_block",
             "bedrock",
@@ -51,6 +53,7 @@ public class Config {
     {
         return getConfig().is_slippery;
     }
+    public static boolean isEndTexture(){return getConfig().is_endtexture;}
     public static int getCameraDistance()
     {
         return getConfig().camera_distance;
@@ -76,6 +79,7 @@ public class Config {
         Config.block = to_return.block;
         Config.is_slippery = to_return.is_slippery;
         Config.camera_type = to_return.camera_type;
+        Config.is_endtexture = to_return.is_endtexture;
         return to_return;
     }
 
@@ -116,6 +120,7 @@ public class Config {
             experimental.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.camera_distance"), Config.camera_distance, 0, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
         }
         experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
+        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_endtexture"), Config.is_endtexture).setSaveConsumer(newValue -> Config.is_endtexture = newValue).build());
         //Build
         return builder;
     }
@@ -125,6 +130,7 @@ public class Config {
         public boolean is_slippery;
         public String camera_type;
         public int camera_distance;
+        public boolean is_endtexture;
 
         public SerializedConfig()
         {
@@ -132,6 +138,7 @@ public class Config {
             this.is_slippery = Config.is_slippery;
             this.camera_type = Config.camera_type;
             this.camera_distance = Config.camera_distance;
+            this.is_endtexture = Config.is_endtexture;
 
         }
         public String serialized(){

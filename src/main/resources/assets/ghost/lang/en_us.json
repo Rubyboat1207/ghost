@@ -7,5 +7,6 @@
   "config_category.ghost.general": "General Options",
   "config_category.ghost.experimental": "Experimental Options",
   "entry.ghost.ghost_block": "Ghost block Block type",
-  "entry.ghost.is_slippery": "Frozen Mode"
+  "entry.ghost.is_slippery": "Frozen Mode",
+  "entry.ghost.is_endtexture": "End Portal Texture on every block"
 }
