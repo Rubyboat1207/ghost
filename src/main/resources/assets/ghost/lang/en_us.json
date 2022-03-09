@@ -8,5 +8,6 @@
   "config_category.ghost.experimental": "Experimental Options",
   "entry.ghost.ghost_block": "Ghost block Block type",
   "entry.ghost.is_slippery": "Frozen Mode",
-  "entry.ghost.is_endtexture": "End Portal Texture on every block"
+  "entry.ghost.player_texture": "Player Skin Texture",
+  "tooltip.ghost.player_texture": "ex. blocks/tnt_side"
 }

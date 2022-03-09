@@ -1,7 +1,6 @@
 package rubyboat.ghost.mixin;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.block.entity.EndPortalBlockEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,8 +14,10 @@ public class PlayerRenderMixin {
 
     @Inject(at = @At("HEAD"), method = "getTexture(Lnet/minecraft/client/network/AbstractClientPlayerEntity;)Lnet/minecraft/util/Identifier;", cancellable = true)
     public void getTexture(AbstractClientPlayerEntity abstractClientPlayerEntity, CallbackInfoReturnable<Identifier> cir) {
-        if(Config.isEndTexture()){
-            cir.setReturnValue(EndPortalBlockEntityRenderer.PORTAL_TEXTURE); //abstractClientPlayerEntity.getSkinTexture()
+        if(!Config.getPlayerTexture().equals("")){
+            cir.setReturnValue(new Identifier("textures/" + Config.getPlayerTexture() + ".png"));
+
+            //abstractClientPlayerEntity.getSkinTexture()
         }
     }
 

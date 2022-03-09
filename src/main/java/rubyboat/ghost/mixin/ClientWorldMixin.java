@@ -5,6 +5,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -42,7 +44,7 @@ public abstract class ClientWorldMixin {
         }
         if(GhostClient.spawnMob.wasPressed())
         {
-            this.addEntity(new Random().nextInt(0, 5000000), new CreeperEntity(EntityType.CREEPER, ((ClientWorld)(Object)this)));
+
         }
     }
 }

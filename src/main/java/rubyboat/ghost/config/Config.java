@@ -1,21 +1,14 @@
 package rubyboat.ghost.config;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import com.ibm.icu.text.ArabicShaping;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
-import me.shedaniel.clothconfig2.impl.builders.IntSliderBuilder;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import rubyboat.ghost.client.GhostClient;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +20,7 @@ public class Config {
     static int camera_distance = 10;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
-    static boolean is_endtexture = false;
+    static String player_texture = "none";
     public static String[] blocks = {
             "diamond_block",
             "bedrock",
@@ -53,7 +46,7 @@ public class Config {
     {
         return getConfig().is_slippery;
     }
-    public static boolean isEndTexture(){return getConfig().is_endtexture;}
+    public static String getPlayerTexture(){return getConfig().player_texture;}
     public static int getCameraDistance()
     {
         return getConfig().camera_distance;
@@ -79,7 +72,7 @@ public class Config {
         Config.block = to_return.block;
         Config.is_slippery = to_return.is_slippery;
         Config.camera_type = to_return.camera_type;
-        Config.is_endtexture = to_return.is_endtexture;
+        Config.player_texture = to_return.player_texture;
         return to_return;
     }
 
@@ -120,7 +113,11 @@ public class Config {
             experimental.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.camera_distance"), Config.camera_distance, 0, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
         }
         experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
-        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_endtexture"), Config.is_endtexture).setSaveConsumer(newValue -> Config.is_endtexture = newValue).build());
+        experimental.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.player_texture"), Config.player_texture)
+                .setSaveConsumer(newValue -> Config.player_texture = newValue)
+                .setTooltip(new TranslatableText("tooltip.ghost.player_texture"))
+                .build()
+        );
         //Build
         return builder;
     }
@@ -130,7 +127,7 @@ public class Config {
         public boolean is_slippery;
         public String camera_type;
         public int camera_distance;
-        public boolean is_endtexture;
+        public String player_texture;
 
         public SerializedConfig()
         {
@@ -138,7 +135,7 @@ public class Config {
             this.is_slippery = Config.is_slippery;
             this.camera_type = Config.camera_type;
             this.camera_distance = Config.camera_distance;
-            this.is_endtexture = Config.is_endtexture;
+            this.player_texture = Config.player_texture;
 
         }
         public String serialized(){
