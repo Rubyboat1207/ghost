@@ -62,60 +62,65 @@ public class Config {
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
     public static boolean isSnow(){return getConfig().in_snow;}
+    public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
     public static SerializedConfig config = null;
+    public static SerializedConfig loadConfig()
+    {
+        File file = new File(path);
+        String fromfile = "";
+        try{
+            fromfile = Files.readString(Path.of(path));
+        }catch (Exception e)
+        {
+            try{
+                Files.writeString(Path.of(path), new SerializedConfig().serialized());
+                fromfile = Files.readString(Path.of(path));
+            }catch (Exception ignored) { }
+            e.printStackTrace();
+        }
+        SerializedConfig to_return = new Gson().fromJson(fromfile, SerializedConfig.class);
+
+        Config.is_sleeve = to_return.is_sleeve;
+        Config.block = to_return.block;
+        Config.is_slippery = to_return.is_slippery;
+        Config.camera_type = to_return.camera_type;
+        Config.player_texture = to_return.player_texture;
+        Config.inNetherPortalEffect = to_return.in_portal;
+        Config.inPowderSnowEffect = to_return.in_snow;
+        Config.title = to_return.title;
+        Config.color = to_return.biomecolor;
+        Config.is_cyrus_mode = to_return.is_cyrus_mode;
+        return to_return;
+    }
+
+
     public static SerializedConfig getConfig()
     {
         if(config == null)
         {
-            File file = new File(path);
-            String fromfile = "";
-            try{
-                fromfile = Files.readString(Path.of(path));
-            }catch (Exception e)
-            {
-                try{
-                    Files.writeString(Path.of(path), new SerializedConfig().serialized());
-                    fromfile = Files.readString(Path.of(path));
-                }catch (Exception ignored) { }
-                e.printStackTrace();
-            }
-            SerializedConfig to_return = new Gson().fromJson(fromfile, SerializedConfig.class);
-
-            Config.is_sleeve = to_return.is_sleeve;
-            Config.block = to_return.block;
-            Config.is_slippery = to_return.is_slippery;
-            Config.camera_type = to_return.camera_type;
-            Config.player_texture = to_return.player_texture;
-            Config.inNetherPortalEffect = to_return.in_portal;
-            Config.inPowderSnowEffect = to_return.in_snow;
-            Config.title = to_return.title;
-            Config.color = to_return.biomecolor;
-            Config.is_cyrus_mode = to_return.is_cyrus_mode;
-            config = to_return;
+            config =loadConfig();
+            return config;
         }
-
         return config;
     }
 
     public static ConfigBuilder MakeConfig()
     {
-        config = null;
         SerializedConfig sc = getConfig();
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(MinecraftClient.getInstance().currentScreen)
                 .setTitle(new TranslatableText("title.ghost.config"));
         builder.setSavingRunnable(() -> {
-            config = null;
-            config = getConfig();
             SerializedConfig config = new SerializedConfig();
             try {
                 Files.writeString(Path.of(path), config.serialized());
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Config.config = loadConfig();
         });
 
         ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.general"));
