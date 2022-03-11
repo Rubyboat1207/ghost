@@ -186,7 +186,7 @@ public abstract class DebugHudMixin {
             Identifier var10001 = this.client.world.getRegistryKey().getValue();
             list.add(var10001 + " FC: " + ((LongSet)longSet).size());
             list.add("");
-            list.add(String.format(Locale.ROOT, "XYZ: %.3f / " + (Config.isCyrusMode() ? GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3) : (this.client.getCameraEntity().getY() > 320 ? "Build Height+ ( "+ GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3) + " )" : GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3))) +  " / %.3f", this.client.getCameraEntity().getX(), this.client.getCameraEntity().getZ()));
+            list.add(String.format(Locale.ROOT, "XYZ: %.3f / " + (Config.isCyrusMode() ? GhostClient.roundTo((float) this.client.getCameraEntity().getY(), 3) : (this.client.getCameraEntity().getY() > 320 ? "Build Height+ ( "+ GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3) + " )" : GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3))) +  " / %.3f", this.client.getCameraEntity().getX(), this.client.getCameraEntity().getZ()));
             list.add(String.format("Block: %d %d %d", blockPos.getX(), blockPos.getY(), blockPos.getZ()));
             list.add(String.format("Chunk: %d %d %d in %d %d %d", blockPos.getX() & 15, blockPos.getY() & 15, blockPos.getZ() & 15, ChunkSectionPos.getSectionCoord(blockPos.getX()), ChunkSectionPos.getSectionCoord(blockPos.getY()), ChunkSectionPos.getSectionCoord(blockPos.getZ())));
             list.add(String.format(Locale.ROOT, "Facing: %s (%s) (%.1f / %.1f)", direction, string2, MathHelper.wrapDegrees(entity.getYaw()), MathHelper.wrapDegrees(entity.getPitch())));
