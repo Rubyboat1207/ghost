@@ -1,5 +1,6 @@
 package rubyboat.ghost.mixin;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -81,5 +82,6 @@ public abstract class CameraMixin {
             this.setRotation(focusedEntity.getYaw(), 90);
             this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY + Config.getCameraDistance(), focusedEntity.getY() + Config.getCameraDistance()), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
         }
+
         ci.cancel();
     }}

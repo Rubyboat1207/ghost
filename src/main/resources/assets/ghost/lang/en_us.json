@@ -1,13 +1,21 @@
 {
   "category.ghost.general": "Ghost Keybinds",
-  "config.ghost.general": "Ghost Options",
+  "ghost.general": "Ghost Options",
   "key.ghost.createghostblock": "Create Ghost block",
   "key.ghost.menu": "Open Menu",
-  "title.ghost.config": "Ghostblock() Config",
+  "title.ghost.config": "Ghost Config",
   "config_category.ghost.general": "General Options",
   "config_category.ghost.experimental": "Experimental Options",
+  "config_category.ghost.texture": "Texture Options",
   "entry.ghost.ghost_block": "Ghost block Block type",
   "entry.ghost.is_slippery": "Frozen Mode",
   "entry.ghost.player_texture": "Player Skin Texture",
-  "tooltip.ghost.player_texture": "ex. blocks/tnt_side"
+  "tooltip.ghost.player_texture": "ex. block/tnt_side",
+  "entry.ghost.is_sleeve": "Sleeve Texture",
+  "entry.ghost.is_snow": "Powder Snow Texture on Camera",
+  "entry.ghost.is_portal": "Nether Portal Texture on Camera",
+  "entry.ghost.title": "Minecraft Menu Title",
+  "config_category.ghost.biome": "Biome Options",
+  "entry.ghost.color": "Sky Color",
+  "tooltip.ghost.color": "Base value: 000000"
 }

@@ -9,7 +9,8 @@
     "ClientWorldMixin",
     "MinecraftClientMixin",
     "PlayerRenderMixin",
-    "EndPortalRendererMixin"
+    "EndPortalRendererMixin",
+    "BiomeMixin"
   ],
   "injectors": {
     "defaultRequire": 1
