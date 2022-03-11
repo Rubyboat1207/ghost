@@ -14,7 +14,15 @@ public abstract class BiomeMixin {
 
     @Inject(at = @At("HEAD"), method = "getSkyColor", cancellable = true)
     public void getSkyColor(CallbackInfoReturnable<Integer> cir) {
-        if(!Config.color().equals(000000))
-        cir.setReturnValue(Config.color()); // + Config.color()
+        if(!Config.color().equals(000000)){
+            cir.setReturnValue(Config.color()); // + Config.color()
+        }
     }
+    @Inject(at = @At("HEAD"), method = "getFogColor", cancellable = true)
+    public void getFogColor(CallbackInfoReturnable<Integer> cir){
+        if(!Config.color().equals(000000)){
+            cir.setReturnValue(Config.fog()); // + Config.fog()
+        }
+    }
+
 }

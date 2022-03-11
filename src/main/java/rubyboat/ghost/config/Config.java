@@ -24,7 +24,8 @@ public class Config {
     static boolean is_sleeve = true;
     static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
-    static boolean inPowderSnowEffect = false;
+    static String inPowderSnowEffect = "none";
+    static Integer fog = 000000;
     static String title = "Minecraft";
     static Integer color = 0;
 
@@ -40,6 +41,12 @@ public class Config {
             "topdown",
             "choppy"
     };
+    public static String[] effects = {
+            "none",
+            "snow",
+            "water",
+            "lava"
+    };
 
     public static String getBlock()
     {
@@ -54,6 +61,9 @@ public class Config {
     {
         return getConfig().is_slippery;
     }
+    public static String getInPowderSnowEffect() {
+        return Arrays.asList(effects).contains(getConfig().in_snow) ? getConfig().in_snow : "none";
+    }
     public static String getPlayerTexture(){return getConfig().player_texture;}
     public static int getCameraDistance()
     {
@@ -61,10 +71,10 @@ public class Config {
     }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
-    public static boolean isSnow(){return getConfig().in_snow;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
+    public static Integer fog(){return getConfig().fog;}
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
     {
@@ -130,15 +140,15 @@ public class Config {
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
         DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.ghost_block"), Config.block)
-            .setSelections(Arrays.asList(blocks))
-            .setSuggestionMode(false)
-            .setSaveConsumer(newValue -> Config.block = newValue
-        );
+                .setSelections(Arrays.asList(blocks))
+                .setSuggestionMode(false)
+                .setSaveConsumer(newValue -> Config.block = newValue
+                );
         DropdownMenuBuilder<String> cameramenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.camera_type"), Config.camera_type)
                 .setSelections(Arrays.asList(camera_modes))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.camera_type = newValue
-        );
+                );
         general.addEntry(blockmenu.build());
         experimental.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
@@ -152,8 +162,6 @@ public class Config {
                 .build()
         );
         texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_snow"), Config.inPowderSnowEffect).setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue).build());
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_portal"), Config.inNetherPortalEffect).setSaveConsumer(newValue -> Config.inNetherPortalEffect = newValue).build());
         general.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
         biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.color"), Config.color)
                 .setSaveConsumer(newValue -> Config.color = newValue)
@@ -163,6 +171,16 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
+        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.fog"), Config.fog)
+                .setSaveConsumer(newValue -> Config.fog = newValue)
+                .setTooltip(new TranslatableText("tooltip.ghost.fog"))
+                .build());
+        DropdownMenuBuilder<String> snow = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.snow"), Config.inPowderSnowEffect)
+                .setSelections(Arrays.asList(effects))
+                .setSuggestionMode(false)
+                .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
+                );
+        texture.addEntry(snow.build());
         //Build
         return builder;
     }
@@ -175,9 +193,10 @@ public class Config {
         public String player_texture;
         public boolean is_sleeve;
         public boolean in_portal;
-        public boolean in_snow;
+        public String in_snow;
         public String title;
         public Integer biomecolor;
+        public Integer fog;
         public boolean is_cyrus_mode;
 
         public SerializedConfig()
@@ -192,6 +211,7 @@ public class Config {
             this.in_portal = Config.inNetherPortalEffect;
             this.title = Config.title;
             this.biomecolor = Config.color;
+            this.fog = Config.fog;
             this.is_cyrus_mode = Config.is_cyrus_mode;
 
         }

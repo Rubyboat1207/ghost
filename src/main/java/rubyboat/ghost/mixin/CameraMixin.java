@@ -2,6 +2,7 @@ package rubyboat.ghost.mixin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.CameraSubmersionType;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import rubyboat.ghost.client.GhostClient;
 import rubyboat.ghost.config.Config;
 
@@ -82,6 +84,19 @@ public abstract class CameraMixin {
             this.setRotation(focusedEntity.getYaw(), 90);
             this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY + Config.getCameraDistance(), focusedEntity.getY() + Config.getCameraDistance()), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
         }
-
         ci.cancel();
-    }}
+    }
+    @Inject(at = @At("HEAD"), method = "getSubmersionType", cancellable = true)
+    public void getSubmersionType(CallbackInfoReturnable<CameraSubmersionType> cir){
+        if(Config.getInPowderSnowEffect().equalsIgnoreCase("snow")){
+            cir.setReturnValue(CameraSubmersionType.POWDER_SNOW);
+        }else if(Config.getInPowderSnowEffect().equalsIgnoreCase("lava")){
+            cir.setReturnValue(CameraSubmersionType.LAVA);
+        }else if(Config.getInPowderSnowEffect().equalsIgnoreCase("water")) {
+            cir.setReturnValue(CameraSubmersionType.WATER);
+        }
+
+    }
+
+
+}
