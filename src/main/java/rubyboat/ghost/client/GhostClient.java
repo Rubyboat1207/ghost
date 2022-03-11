@@ -19,7 +19,9 @@ public class GhostClient implements ClientModInitializer {
     public static KeyBinding keyBinding2;
     public static KeyBinding spawnMob;
     private static final Logger LOGGER = LogManager.getLogger();
-
+    public static float roundTo(float number, int decimalPoints) {
+        return (float) (Math.floor(number * Math.pow(10, decimalPoints)) * Math.pow(10, -decimalPoints));
+    }
 
     @Override
     public void onInitializeClient() {

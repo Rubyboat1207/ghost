@@ -22,6 +22,7 @@ public class Config {
     static boolean is_slippery = false;
     static String player_texture = "none";
     static boolean is_sleeve = true;
+    static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
     static boolean inPowderSnowEffect = false;
     static String title = "Minecraft";
@@ -63,43 +64,52 @@ public class Config {
     public static boolean isSnow(){return getConfig().in_snow;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
-
+    public static SerializedConfig config = null;
     public static SerializedConfig getConfig()
     {
-        File file = new File(path);
-        String fromfile = "";
-        try{
-            fromfile = Files.readString(Path.of(path));
-        }catch (Exception e)
+        if(config == null)
         {
+            File file = new File(path);
+            String fromfile = "";
             try{
-                Files.writeString(Path.of(path), new SerializedConfig().serialized());
                 fromfile = Files.readString(Path.of(path));
-            }catch (Exception ignored) { }
-            e.printStackTrace();
-        }
-        SerializedConfig to_return = new Gson().fromJson(fromfile, SerializedConfig.class);
+            }catch (Exception e)
+            {
+                try{
+                    Files.writeString(Path.of(path), new SerializedConfig().serialized());
+                    fromfile = Files.readString(Path.of(path));
+                }catch (Exception ignored) { }
+                e.printStackTrace();
+            }
+            SerializedConfig to_return = new Gson().fromJson(fromfile, SerializedConfig.class);
 
-        Config.is_sleeve = to_return.is_sleeve;
-        Config.block = to_return.block;
-        Config.is_slippery = to_return.is_slippery;
-        Config.camera_type = to_return.camera_type;
-        Config.player_texture = to_return.player_texture;
-        Config.inNetherPortalEffect = to_return.in_portal;
-        Config.inPowderSnowEffect = to_return.in_snow;
-        Config.title = to_return.title;
-        Config.color = to_return.biomecolor;
-        return to_return;
+            Config.is_sleeve = to_return.is_sleeve;
+            Config.block = to_return.block;
+            Config.is_slippery = to_return.is_slippery;
+            Config.camera_type = to_return.camera_type;
+            Config.player_texture = to_return.player_texture;
+            Config.inNetherPortalEffect = to_return.in_portal;
+            Config.inPowderSnowEffect = to_return.in_snow;
+            Config.title = to_return.title;
+            Config.color = to_return.biomecolor;
+            Config.is_cyrus_mode = to_return.is_cyrus_mode;
+            config = to_return;
+        }
+
+        return config;
     }
 
     public static ConfigBuilder MakeConfig()
     {
+        config = null;
         SerializedConfig sc = getConfig();
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(MinecraftClient.getInstance().currentScreen)
                 .setTitle(new TranslatableText("title.ghost.config"));
         builder.setSavingRunnable(() -> {
+            config = null;
+            config = getConfig();
             SerializedConfig config = new SerializedConfig();
             try {
                 Files.writeString(Path.of(path), config.serialized());
@@ -144,6 +154,10 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.color = newValue)
                 .setTooltip(new TranslatableText("tooltip.ghost.color"))
                 .build());
+        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
+                .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
+                .build()
+        );
         //Build
         return builder;
     }
@@ -159,6 +173,7 @@ public class Config {
         public boolean in_snow;
         public String title;
         public Integer biomecolor;
+        public boolean is_cyrus_mode;
 
         public SerializedConfig()
         {
@@ -172,6 +187,8 @@ public class Config {
             this.in_portal = Config.inNetherPortalEffect;
             this.title = Config.title;
             this.biomecolor = Config.color;
+            this.is_cyrus_mode = Config.is_cyrus_mode;
+
         }
         public String serialized(){
             return new Gson().toJson(this);

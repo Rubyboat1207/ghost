@@ -32,8 +32,6 @@ public abstract class ClientWorldMixin {
 
     @Shadow public abstract void setBlockStateWithoutNeighborUpdates(BlockPos pos, BlockState state);
 
-    @Shadow public abstract void addEntity(int id, Entity entity);
-
     @Inject(at = @At("HEAD"), method = "tick")
     public void tick(CallbackInfo ci)
     {
@@ -41,10 +39,6 @@ public abstract class ClientWorldMixin {
         {
             BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
             this.setBlockStateWithoutNeighborUpdates(suggestedBlockpos, Registry.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState());
-        }
-        if(GhostClient.spawnMob.wasPressed())
-        {
-
         }
     }
 }
