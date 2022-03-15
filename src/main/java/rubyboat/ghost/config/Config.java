@@ -20,13 +20,14 @@ public class Config {
     static int camera_distance = 10;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
-    static String player_texture = "none";
+    static String player_texture = "";
     static boolean is_sleeve = true;
-    static boolean is_cyrus_mode = true;
+    static boolean is_cyrus_mode = false;
+    static boolean is_thirst = false;
     static boolean inNetherPortalEffect = false;
     static String inPowderSnowEffect = "none";
     static Integer fog = 000000;
-    static String title = "Minecraft";
+    static String title = "";
     static Integer color = 0;
 
     public static String[] blocks = {
@@ -34,7 +35,8 @@ public class Config {
             "bedrock",
             "dirt",
             "pink_wool",
-            "polished_andesite"
+            "polished_andesite",
+            "dried_kelp"
     };
     public static String[] camera_modes = {
             "normal",
@@ -71,8 +73,9 @@ public class Config {
     }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
+    public static boolean is_thirst(){return getConfig().is_thirst;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
-    public static String title(){return getConfig().title;}
+    public static String getTitle(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
     public static Integer fog(){return getConfig().fog;}
     public static SerializedConfig config = null;
@@ -102,6 +105,7 @@ public class Config {
         Config.title = to_return.title;
         Config.color = to_return.biomecolor;
         Config.is_cyrus_mode = to_return.is_cyrus_mode;
+        Config.is_thirst = to_return.is_thirst;
         return to_return;
     }
 
@@ -136,6 +140,7 @@ public class Config {
         ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.general"));
         ConfigCategory experimental = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.experimental"));
         ConfigCategory texture = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.texture"));
+        ConfigCategory challenges = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.challenges"));
         ConfigCategory biome = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.biome"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
@@ -171,6 +176,10 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
+        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.thirst"), Config.is_cyrus_mode)
+                .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
+                .build()
+        );
         biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.fog"), Config.fog)
                 .setSaveConsumer(newValue -> Config.fog = newValue)
                 .setTooltip(new TranslatableText("tooltip.ghost.fog"))
@@ -197,6 +206,7 @@ public class Config {
         public String title;
         public Integer biomecolor;
         public Integer fog;
+        public boolean is_thirst;
         public boolean is_cyrus_mode;
 
         public SerializedConfig()
@@ -213,6 +223,7 @@ public class Config {
             this.biomecolor = Config.color;
             this.fog = Config.fog;
             this.is_cyrus_mode = Config.is_cyrus_mode;
+            this.is_thirst = Config.is_thirst;
 
         }
         public String serialized(){

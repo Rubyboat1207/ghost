@@ -23,5 +23,6 @@
   "entry.ghost.fog": "Fog Color",
   "tooltip.ghost.fog": "Base value: 000000",
   "entry.ghost.snow": "Powder Snow Texture",
-  "entry.ghost.cyrus_mode": "Remove Negative Y Coordinates"
+  "entry.ghost.cyrus_mode": "Remove Negative Y Coordinates",
+  "config_category.ghost.challenges": "Challenges"
 }

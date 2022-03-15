@@ -4,20 +4,18 @@
   "package": "rubyboat.ghost.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "BiomeMixin",
     "BlockMixin",
     "CameraMixin",
     "ClientWorldMixin",
     "EndPortalRendererMixin",
     "MinecraftClientMixin",
-    "PlayerRenderMixin",
-    "PlayerRenderMixin",
-    "EndPortalRendererMixin",
-    "BiomeMixin"
+    "PlayerRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "DebugHudMixin"
+    "DebugHudMixin",
   ]
 }
