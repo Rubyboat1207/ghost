@@ -17,7 +17,7 @@ public class GhostClient implements ClientModInitializer {
 
     public static KeyBinding keyBinding;
     public static KeyBinding keyBinding2;
-    public static KeyBinding spawnMob;
+    public static KeyBinding zoom;
     private static final Logger LOGGER = LogManager.getLogger();
     public static float roundTo(float number, int decimalPoints) {
         return (float) (Math.floor(number * Math.pow(10, decimalPoints)) * Math.pow(10, -decimalPoints));
@@ -38,10 +38,10 @@ public class GhostClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_RIGHT_SHIFT, // The keycode of the key
                 "category.ghost.general" // The translation key of the keybinding's category.
         ));
-        spawnMob = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.ghost.spawn_mob", // The translation key of the keybinding's name
+        zoom = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ghost.zoom", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_K, // The keycode of the key
+                GLFW.GLFW_KEY_C, // The keycode of the key
                 "category.ghost.general" // The translation key of the keybinding's category.
         ));
     }

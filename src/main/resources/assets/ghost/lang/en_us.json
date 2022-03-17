@@ -26,5 +26,6 @@
   "entry.ghost.cyrus_mode": "Remove Negative Y Coordinates",
   "config_category.ghost.time" : "Time Settings",
   "tooltip.ghost.time": "Set to -1 to turn off custom time",
-  "entry.ghost.time":"Time of Day"
+  "entry.ghost.time":"Time of Day",
+  "entry.ghost.zoom_strength":"Zoom"
 }

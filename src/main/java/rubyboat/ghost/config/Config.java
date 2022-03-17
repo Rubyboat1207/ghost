@@ -18,6 +18,7 @@ public class Config {
     static String block = "diamond_block";
     static String camera_type = "";
     static int camera_distance = 10;
+    static Integer zoom_strength = 50;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
     static String player_texture = "";
@@ -72,6 +73,10 @@ public class Config {
     {
         return getConfig().camera_distance;
     }
+    public static int getZoomStrength()
+    {
+        return getConfig().zoom_strength;
+    }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
@@ -107,6 +112,7 @@ public class Config {
         Config.color = to_return.biomecolor;
         Config.is_cyrus_mode = to_return.is_cyrus_mode;
         Config.time = to_return.time;
+        Config.zoom_strength = to_return.zoom_strength;
         return to_return;
     }
 
@@ -115,7 +121,7 @@ public class Config {
     {
         if(config == null)
         {
-            config =loadConfig();
+            config = loadConfig();
             return config;
         }
         return config;
@@ -195,6 +201,13 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.time = newValue)
                 .build()
         );
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.zoom_strength"), Config.zoom_strength, 0 , 100)
+                .setDefaultValue(50)
+                .setMin(0)
+                .setMax(100)
+                .setSaveConsumer(newValue -> Config.zoom_strength = newValue)
+                .build()
+        );
         //Build
         return builder;
     }
@@ -213,6 +226,7 @@ public class Config {
         public Integer fog;
         public boolean is_cyrus_mode;
         public Integer time;
+        public int zoom_strength;
 
         public SerializedConfig()
         {
@@ -229,7 +243,7 @@ public class Config {
             this.fog = Config.fog;
             this.is_cyrus_mode = Config.is_cyrus_mode;
             this.time = Config.time;
-
+            this.zoom_strength = Config.zoom_strength;
         }
         public String serialized(){
             return new Gson().toJson(this);
