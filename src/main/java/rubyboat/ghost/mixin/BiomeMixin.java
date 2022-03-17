@@ -42,16 +42,16 @@ public abstract class BiomeMixin {
 
         }
     }
-    @Inject(at = @At("HEAD"), method = "getDownfall", cancellable = true) //none of this owkr aHAHHAHA
-    public void getDownfall(CallbackInfoReturnable<Float> cir){
-        if(Objects.equals(Config.getWeather(), "rain")){
-            cir.setReturnValue(1f);
-        }else if (Config.getWeather() == "thunder"){
-            cir.setReturnValue(2f);
-        }else if (Config.getWeather() == "snow"){
-            cir.setReturnValue(3f);
-        }else if (Config.getWeather() == "test"){
-            cir.setReturnValue(4f);
+    @Inject(at = @At("HEAD"), method = "getWaterColor", cancellable = true)
+    public void getWaterColor(CallbackInfoReturnable<Integer> cir){
+        if(!Config.water().equals(000000)){
+            cir.setReturnValue(Config.water());
+        }
+    }
+    @Inject(at = @At("HEAD"), method = "getWaterFogColor", cancellable = true)
+    public void getWaterFogColor(CallbackInfoReturnable<Integer> cir){
+        if(!Config.waterfog().equals(000000)){
+            cir.setReturnValue(Config.waterfog());
         }
     }
 
