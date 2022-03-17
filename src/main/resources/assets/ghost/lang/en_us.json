@@ -27,5 +27,9 @@
   "config_category.ghost.time" : "Time Settings",
   "tooltip.ghost.time": "Set to -1 to turn off custom time",
   "entry.ghost.time":"Time of Day",
-  "entry.ghost.zoom_strength":"Zoom"
+  "entry.ghost.leaf": "Leave Color",
+  "tooltip.ghost.leaf": "Base value: 000000",
+  "entry.ghost.grass": "Grass Color",
+  "tooltip.ghost.grass": "Base value: 000000",
+  "entry.ghost.weather": "Weather Type (DOESNT WORK)"
 }

@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.TranslatableText;
 
@@ -18,27 +19,27 @@ public class Config {
     static String block = "diamond_block";
     static String camera_type = "";
     static int camera_distance = 10;
-    static Integer zoom_strength = 50;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
-    static String player_texture = "";
+    static String player_texture = "none";
     static boolean is_sleeve = true;
-    static boolean is_cyrus_mode = false;
-    static boolean is_thirst = false;
+    static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
     static String inPowderSnowEffect = "none";
     static Integer fog = 000000;
-    static String title = "";
+    static String title = "Minecraft";
     static Integer color = 0;
     static Integer time = 0;
+    static Integer leaf = 0;
+    static Integer grass = 0;
+    static String weather = "";
 
     public static String[] blocks = {
             "diamond_block",
             "bedrock",
             "dirt",
             "pink_wool",
-            "polished_andesite",
-            "dried_kelp"
+            "polished_andesite"
     };
     public static String[] camera_modes = {
             "normal",
@@ -51,6 +52,13 @@ public class Config {
             "water",
             "lava"
     };
+    public static String[] downfall = {
+            "none",
+            "rain",
+            "thunder",
+            "snow",
+            "test"
+    };
 
     public static String getBlock()
     {
@@ -59,6 +67,9 @@ public class Config {
     public static String getCamera_type()
     {
         return Arrays.asList(camera_modes).contains(getConfig().camera_type) ? getConfig().camera_type : "normal";
+    }
+    public static String getWeather(){
+        return Arrays.asList(downfall).contains(getConfig().weather) ? getConfig().weather : "none";
     }
 
     public static boolean isSlippery()
@@ -73,17 +84,15 @@ public class Config {
     {
         return getConfig().camera_distance;
     }
-    public static int getZoomStrength()
-    {
-        return getConfig().zoom_strength;
-    }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
-    public static String getTitle(){return getConfig().title;}
+    public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
     public static Integer fog(){return getConfig().fog;}
     public static Integer time(){return getConfig().time;}
+    public static Integer leaf(){return getConfig().leaf;}
+    public static Integer grass(){return getConfig().grass;}
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
     {
@@ -112,7 +121,9 @@ public class Config {
         Config.color = to_return.biomecolor;
         Config.is_cyrus_mode = to_return.is_cyrus_mode;
         Config.time = to_return.time;
-        Config.zoom_strength = to_return.zoom_strength;
+        Config.leaf = to_return.leaf;
+        Config.grass = to_return.grass;
+        Config.weather = to_return.weather;
         return to_return;
     }
 
@@ -121,7 +132,7 @@ public class Config {
     {
         if(config == null)
         {
-            config = loadConfig();
+            config =loadConfig();
             return config;
         }
         return config;
@@ -136,6 +147,7 @@ public class Config {
                 .setTitle(new TranslatableText("title.ghost.config"));
         builder.setSavingRunnable(() -> {
             SerializedConfig config = new SerializedConfig();
+            MinecraftClient.getInstance().worldRenderer.reload();
             try {
                 Files.writeString(Path.of(path), config.serialized());
             } catch (IOException e) {
@@ -160,6 +172,12 @@ public class Config {
                 .setSelections(Arrays.asList(camera_modes))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.camera_type = newValue
+                );
+
+        DropdownMenuBuilder<String> weather = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.weather"), Config.weather)
+                .setSelections(Arrays.asList(downfall))
+                .setSuggestionMode(false)
+                .setSaveConsumer(newValue -> Config.weather = newValue
                 );
         general.addEntry(blockmenu.build());
         experimental.addEntry(cameramenu.build());
@@ -192,20 +210,22 @@ public class Config {
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
                 );
+       biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.leaf"), Config.leaf)
+                .setSaveConsumer(newValue -> Config.leaf = newValue)
+                .setTooltip(new TranslatableText("tooltip.ghost.leaf"))
+                .build());
+       biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.grass"), Config.grass)
+               .setSaveConsumer(newValue -> Config.grass = newValue)
+               .setTooltip(new TranslatableText("tooltip.ghost.grass"))
+               .build());
         texture.addEntry(snow.build());
+        biome.addEntry(weather.build());
         time.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.time"), Config.time, -1 , 24000)
                 .setDefaultValue(0)
                 .setMin(-1)
                 .setMax(24000)
                 .setTooltip(new TranslatableText("tooltip.ghost.time"))
                 .setSaveConsumer(newValue -> Config.time = newValue)
-                .build()
-        );
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.zoom_strength"), Config.zoom_strength, 0 , 100)
-                .setDefaultValue(50)
-                .setMin(0)
-                .setMax(100)
-                .setSaveConsumer(newValue -> Config.zoom_strength = newValue)
                 .build()
         );
         //Build
@@ -226,7 +246,9 @@ public class Config {
         public Integer fog;
         public boolean is_cyrus_mode;
         public Integer time;
-        public int zoom_strength;
+        public Integer leaf;
+        public Integer grass;
+        public String weather;
 
         public SerializedConfig()
         {
@@ -243,7 +265,10 @@ public class Config {
             this.fog = Config.fog;
             this.is_cyrus_mode = Config.is_cyrus_mode;
             this.time = Config.time;
-            this.zoom_strength = Config.zoom_strength;
+            this.leaf = Config.leaf;
+            this.grass = Config.grass;
+            this.weather = Config.weather;
+
         }
         public String serialized(){
             return new Gson().toJson(this);
