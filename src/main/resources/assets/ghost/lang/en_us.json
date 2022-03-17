@@ -22,7 +22,9 @@
   "tooltip.ghost.color": "Base value: 000000",
   "entry.ghost.fog": "Fog Color",
   "tooltip.ghost.fog": "Base value: 000000",
-  "entry.ghost.snow": "Powder Snow Texture",
+  "entry.ghost.snow": "Screen Texture:",
   "entry.ghost.cyrus_mode": "Remove Negative Y Coordinates",
-  "config_category.ghost.challenges": "Challenges"
+  "config_category.ghost.time" : "Time Settings",
+  "tooltip.ghost.time": "Set to -1 to turn off custom time",
+  "entry.ghost.time":"Time of Day"
 }

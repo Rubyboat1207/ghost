@@ -29,6 +29,7 @@ public class Config {
     static Integer fog = 000000;
     static String title = "";
     static Integer color = 0;
+    static Integer time = 0;
 
     public static String[] blocks = {
             "diamond_block",
@@ -73,11 +74,11 @@ public class Config {
     }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
-    public static boolean is_thirst(){return getConfig().is_thirst;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
     public static String getTitle(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
     public static Integer fog(){return getConfig().fog;}
+    public static Integer time(){return getConfig().time;}
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
     {
@@ -105,7 +106,7 @@ public class Config {
         Config.title = to_return.title;
         Config.color = to_return.biomecolor;
         Config.is_cyrus_mode = to_return.is_cyrus_mode;
-        Config.is_thirst = to_return.is_thirst;
+        Config.time = to_return.time;
         return to_return;
     }
 
@@ -140,8 +141,8 @@ public class Config {
         ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.general"));
         ConfigCategory experimental = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.experimental"));
         ConfigCategory texture = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.texture"));
-        ConfigCategory challenges = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.challenges"));
         ConfigCategory biome = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.biome"));
+        ConfigCategory time = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.time"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
         DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.ghost_block"), Config.block)
@@ -176,10 +177,6 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
-        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.thirst"), Config.is_cyrus_mode)
-                .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
-                .build()
-        );
         biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.fog"), Config.fog)
                 .setSaveConsumer(newValue -> Config.fog = newValue)
                 .setTooltip(new TranslatableText("tooltip.ghost.fog"))
@@ -190,6 +187,14 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
                 );
         texture.addEntry(snow.build());
+        time.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.time"), Config.time, -1 , 24000)
+                .setDefaultValue(0)
+                .setMin(-1)
+                .setMax(24000)
+                .setTooltip(new TranslatableText("tooltip.ghost.time"))
+                .setSaveConsumer(newValue -> Config.time = newValue)
+                .build()
+        );
         //Build
         return builder;
     }
@@ -206,8 +211,8 @@ public class Config {
         public String title;
         public Integer biomecolor;
         public Integer fog;
-        public boolean is_thirst;
         public boolean is_cyrus_mode;
+        public Integer time;
 
         public SerializedConfig()
         {
@@ -223,7 +228,7 @@ public class Config {
             this.biomecolor = Config.color;
             this.fog = Config.fog;
             this.is_cyrus_mode = Config.is_cyrus_mode;
-            this.is_thirst = Config.is_thirst;
+            this.time = Config.time;
 
         }
         public String serialized(){
