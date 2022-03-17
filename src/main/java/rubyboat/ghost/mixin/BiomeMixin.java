@@ -48,6 +48,12 @@ public abstract class BiomeMixin {
             cir.setReturnValue(Config.water());
         }
     }
+    @Inject(at = @At("HEAD"), method = "getWaterFogColor", cancellable = true)
+    public void getWaterFogColor(CallbackInfoReturnable<Integer> cir){
+        if(!Config.waterfog().equals(000000)){
+            cir.setReturnValue(Config.waterfog());
+        }
+    }
 
 
 }
