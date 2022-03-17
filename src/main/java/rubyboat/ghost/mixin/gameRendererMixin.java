@@ -18,7 +18,7 @@ public class gameRendererMixin {
     public void getZoomLevel(CallbackInfoReturnable<Double> callbackInfo) {
         if(GhostClient.zoom.isPressed()) {
             double fov = callbackInfo.getReturnValue();
-            callbackInfo.setReturnValue(fov * (1 - (Config.getZoomStrength() / 100)));
+            callbackInfo.setReturnValue(fov * (1f - (Config.getZoomStrength() / 100f)));
         }
     }
 }

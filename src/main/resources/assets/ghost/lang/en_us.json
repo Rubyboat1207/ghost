@@ -6,7 +6,7 @@
   "title.ghost.config": "Ghost Config",
   "config_category.ghost.general": "General Options",
   "config_category.ghost.experimental": "Experimental Options",
-  "config_category.ghost.texture": "Texture Options",
+  "config_category.ghost.texture": "Model/Texture Options",
   "entry.ghost.ghost_block": "Ghost block Block type",
   "entry.ghost.camera_type": "Camera Types",
   "entry.ghost.is_slippery": "Frozen Mode",
@@ -31,5 +31,11 @@
   "tooltip.ghost.leaf": "Base value: 000000",
   "entry.ghost.grass": "Grass Color",
   "tooltip.ghost.grass": "Base value: 000000",
-  "entry.ghost.weather": "Weather Type (DOESNT WORK)"
+  "entry.ghost.weather": "Weather Type (DOESNT WORK)",
+  "entry.ghost.render_arms": "Render Player Arms",
+  "entry.ghost.render_legs": "Render Player Legs",
+  "entry.ghost.render_body": "Render Player Body",
+  "entry.ghost.render_head": "Render Player Head",
+  "entry.ghost.zoom_strength": "Zoom Strength",
+  "entry.ghost.model_offset": "Model Offset"
 }

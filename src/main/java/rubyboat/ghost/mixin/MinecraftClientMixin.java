@@ -15,8 +15,6 @@ import rubyboat.ghost.config.Config;
 @Environment(EnvType.CLIENT)
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
-    @Shadow protected abstract String getWindowTitle();
-
     @Inject(at = @At("HEAD"), method = "tick")
     public void tick(CallbackInfo ci){
         if(GhostClient.keyBinding2.isPressed())

@@ -12,6 +12,7 @@ import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +35,11 @@ public abstract class PlayerRenderMixin {
         }
     }
 
+    @Inject(at = @At("RETURN"), method = "getPositionOffset(Lnet/minecraft/client/network/AbstractClientPlayerEntity;F)Lnet/minecraft/util/math/Vec3d;", cancellable = true)
+    public void getTexture(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, CallbackInfoReturnable<Vec3d> cir) {
+        cir.setReturnValue(cir.getReturnValue().add(0, Config.getModelOffset(), 0));
+    }
+
     @Inject(at = @At("HEAD"), method = "renderArm", cancellable = true)
     private void renderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity player, ModelPart arm, ModelPart sleeve, CallbackInfo ci) {
         if(!Config.getPlayerTexture().equalsIgnoreCase("")){
@@ -52,6 +58,33 @@ public abstract class PlayerRenderMixin {
             ci.cancel();
         }
     }
-
+    @Inject(at = @At("RETURN"), method = "setModelPose", cancellable = true)
+    private void renderArm(AbstractClientPlayerEntity player, CallbackInfo ci) {
+        PlayerEntityModel<AbstractClientPlayerEntity> playerEntityModel = (PlayerEntityModel)(((PlayerEntityRenderer)(Object)this).getModel());
+        if(!Config.isRender_arms())
+        {
+            playerEntityModel.leftArm.visible = false;
+            playerEntityModel.rightArm.visible = false;
+            playerEntityModel.leftSleeve.visible = false;
+            playerEntityModel.rightSleeve.visible = false;
+        }
+        if(!Config.isRender_body())
+        {
+            playerEntityModel.body.visible = false;
+            playerEntityModel.jacket.visible = false;
+        }
+        if(!Config.isRender_legs())
+        {
+            playerEntityModel.leftLeg.visible = false;
+            playerEntityModel.rightLeg.visible = false;
+            playerEntityModel.leftPants.visible = false;
+            playerEntityModel.rightPants.visible = false;
+        }
+        if(!Config.isRender_head())
+        {
+            playerEntityModel.head.visible = false;
+            playerEntityModel.hat.visible = false;
+        }
+    }
 
 }

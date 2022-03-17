@@ -23,6 +23,7 @@ public class Config {
     static boolean is_slippery = false;
     static String player_texture = "none";
     static boolean is_sleeve = true;
+    static int zoom_strength = 75;
     static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
     static String inPowderSnowEffect = "none";
@@ -32,6 +33,11 @@ public class Config {
     static Integer time = 0;
     static Integer leaf = 0;
     static Integer grass = 0;
+    static boolean render_arms = true;
+    static boolean render_legs = true;
+    static boolean render_body = true;
+    static boolean render_head = true;
+    static float model_offset = 0;
     static String weather = "";
 
     public static String[] blocks = {
@@ -84,9 +90,22 @@ public class Config {
     {
         return getConfig().camera_distance;
     }
+    public static String getTitle()
+    {
+        return getConfig().title;
+    }
+    public static int getZoomStrength()
+    {
+        return getConfig().zoom_strength;
+    }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
+    public static boolean isRender_arms(){return getConfig().render_arms;}
+    public static boolean isRender_legs(){return getConfig().render_legs;}
+    public static boolean isRender_body(){return getConfig().render_body;}
+    public static boolean isRender_head(){return getConfig().render_head;}
+    public static float getModelOffset(){return getConfig().model_offset;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
     public static Integer fog(){return getConfig().fog;}
@@ -124,6 +143,12 @@ public class Config {
         Config.leaf = to_return.leaf;
         Config.grass = to_return.grass;
         Config.weather = to_return.weather;
+        Config.zoom_strength = to_return.zoom_strength;
+        Config.render_arms = to_return.render_arms;
+        Config.render_legs = to_return.render_legs;
+        Config.render_body = to_return.render_body;
+        Config.render_head = to_return.render_head;
+        Config.model_offset = to_return.model_offset;
         return to_return;
     }
 
@@ -210,14 +235,31 @@ public class Config {
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
                 );
+
        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.leaf"), Config.leaf)
                 .setSaveConsumer(newValue -> Config.leaf = newValue)
                 .setTooltip(new TranslatableText("tooltip.ghost.leaf"))
                 .build());
-       biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.grass"), Config.grass)
-               .setSaveConsumer(newValue -> Config.grass = newValue)
-               .setTooltip(new TranslatableText("tooltip.ghost.grass"))
-               .build());
+        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.grass"), Config.grass)
+                .setSaveConsumer(newValue -> Config.grass = newValue)
+                .setTooltip(new TranslatableText("tooltip.ghost.grass"))
+                .build());
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_arms"), Config.render_arms)
+                .setSaveConsumer(newValue -> Config.render_arms = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_legs"), Config.render_legs)
+                .setSaveConsumer(newValue -> Config.render_legs = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_body"), Config.render_body)
+                .setSaveConsumer(newValue -> Config.render_body = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_head"), Config.render_head)
+                .setSaveConsumer(newValue -> Config.render_head = newValue)
+                .build()
+        );
         texture.addEntry(snow.build());
         biome.addEntry(weather.build());
         time.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.time"), Config.time, -1 , 24000)
@@ -228,6 +270,16 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.time = newValue)
                 .build()
         );
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.zoom_strength"), Config.zoom_strength, 50 , 95)
+                .setDefaultValue(0)
+                .setMin(50)
+                .setMax(95)
+                .setSaveConsumer(newValue -> Config.zoom_strength = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startFloatField(new TranslatableText("entry.ghost.playerModelOffset"), Config.model_offset)
+                .setSaveConsumer(newValue -> Config.model_offset = newValue)
+                .build());
         //Build
         return builder;
     }
@@ -249,6 +301,13 @@ public class Config {
         public Integer leaf;
         public Integer grass;
         public String weather;
+        public boolean render_arms;
+        public boolean render_legs;
+        public boolean render_body;
+        public boolean render_head;
+        public float model_offset;
+
+        public int zoom_strength;
 
         public SerializedConfig()
         {
@@ -268,6 +327,13 @@ public class Config {
             this.leaf = Config.leaf;
             this.grass = Config.grass;
             this.weather = Config.weather;
+            this.zoom_strength = Config.zoom_strength;
+            this.render_arms = Config.render_arms;
+            this.render_legs = Config.render_legs;
+            this.render_body = Config.render_body;
+            this.render_head = Config.render_head;
+            this.model_offset = Config.model_offset;
+
 
         }
         public String serialized(){
