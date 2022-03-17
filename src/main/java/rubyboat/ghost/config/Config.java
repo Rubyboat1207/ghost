@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.ColorFieldBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.minecraft.client.MinecraftClient;
@@ -39,6 +40,7 @@ public class Config {
     static boolean render_head = true;
     static float model_offset = 0;
     static String weather = "";
+    static Integer water = 0;
 
     public static String[] blocks = {
             "diamond_block",
@@ -112,6 +114,7 @@ public class Config {
     public static Integer time(){return getConfig().time;}
     public static Integer leaf(){return getConfig().leaf;}
     public static Integer grass(){return getConfig().grass;}
+    public static Integer water(){return getConfig().water;}
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
     {
@@ -261,7 +264,6 @@ public class Config {
                 .build()
         );
         texture.addEntry(snow.build());
-        biome.addEntry(weather.build());
         time.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.time"), Config.time, -1 , 24000)
                 .setDefaultValue(0)
                 .setMin(-1)
@@ -279,6 +281,10 @@ public class Config {
         );
         texture.addEntry(entryBuilder.startFloatField(new TranslatableText("entry.ghost.playerModelOffset"), Config.model_offset)
                 .setSaveConsumer(newValue -> Config.model_offset = newValue)
+                .build());
+        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.water"), Config.water)
+                .setSaveConsumer(newValue -> Config.water = newValue)
+                .setTooltip(new TranslatableText("tooltip.ghost.water"))
                 .build());
         //Build
         return builder;
@@ -306,6 +312,7 @@ public class Config {
         public boolean render_body;
         public boolean render_head;
         public float model_offset;
+        public Integer water;
 
         public int zoom_strength;
 
@@ -333,6 +340,7 @@ public class Config {
             this.render_body = Config.render_body;
             this.render_head = Config.render_head;
             this.model_offset = Config.model_offset;
+            this.water = Config.water;
 
 
         }

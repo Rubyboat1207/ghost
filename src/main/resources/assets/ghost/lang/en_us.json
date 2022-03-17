@@ -37,5 +37,7 @@
   "entry.ghost.render_body": "Render Player Body",
   "entry.ghost.render_head": "Render Player Head",
   "entry.ghost.zoom_strength": "Zoom Strength",
-  "entry.ghost.model_offset": "Model Offset"
+  "entry.ghost.model_offset": "Model Offset",
+  "entry.ghost.water": "Water Color",
+  "tooltip.ghost.water": "Base Vaule: 000000"
 }
