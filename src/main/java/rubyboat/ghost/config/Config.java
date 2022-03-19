@@ -27,6 +27,7 @@ public class Config {
     static int zoom_strength = 75;
     static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
+    static boolean bouncy = false;
     static String inPowderSnowEffect = "none";
     static Integer fog = 000000;
     static String title = "Minecraft";
@@ -101,6 +102,10 @@ public class Config {
     {
         return getConfig().zoom_strength;
     }
+    public static boolean getBouncy()
+    {
+        return getConfig().bouncy;
+    }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
@@ -156,6 +161,7 @@ public class Config {
         Config.model_offset = to_return.model_offset;
         Config.water = to_return.water;
         Config.waterfog = to_return.waterfog;
+        Config.bouncy = to_return.bouncy;
         return to_return;
     }
 
@@ -267,6 +273,10 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.render_head = newValue)
                 .build()
         );
+        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.bouncy"), Config.bouncy)
+                .setSaveConsumer(newValue -> Config.bouncy = newValue)
+                .build()
+        );
         texture.addEntry(snow.build());
         time.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.time"), Config.time, -1 , 24000)
                 .setDefaultValue(0)
@@ -319,6 +329,7 @@ public class Config {
         public boolean render_legs;
         public boolean render_body;
         public boolean render_head;
+        public boolean bouncy;
         public float model_offset;
         public Integer water;
         public Integer waterfog;
@@ -351,6 +362,7 @@ public class Config {
             this.model_offset = Config.model_offset;
             this.water = Config.water;
             this.waterfog = Config.waterfog;
+            this.bouncy = Config.bouncy;
 
         }
         public String serialized(){

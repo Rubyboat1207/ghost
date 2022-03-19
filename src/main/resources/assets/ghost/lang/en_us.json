@@ -36,6 +36,7 @@
   "entry.ghost.render_legs": "Render Player Legs",
   "entry.ghost.render_body": "Render Player Body",
   "entry.ghost.render_head": "Render Player Head",
+  "entry.ghost.bouncy": "Bouncy",
   "entry.ghost.zoom_strength": "Zoom Strength",
   "entry.ghost.model_offset": "Model Offset",
   "entry.ghost.water": "Water Color",
