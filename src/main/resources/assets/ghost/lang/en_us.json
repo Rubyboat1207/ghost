@@ -41,5 +41,7 @@
   "entry.ghost.water": "Water Color",
   "tooltip.ghost.water": "Base value: 000000",
   "entry.ghost.waterfog":"Water Fog Color",
-  "tooltip.ghost.waterfog": "Base value: 000000"
+  "tooltip.ghost.waterfog": "Base value: 000000",
+  "entry.ghost.version": "Minecraft Version",
+  "entry.ghost.distance": "Zoom Out Camera Distance"
 }

@@ -72,7 +72,8 @@ public abstract class CameraMixin {
                 if (inverseView) {
                     this.setRotation(this.yaw + 180.0f, -this.pitch);
                 }
-                this.moveBy(-this.clipToSpace(4.0), 0.0, 0.0);
+
+                this.moveBy(-this.clipToSpace(Config.getDistance()), 0.0, 0.0);
             } else if (focusedEntity instanceof LivingEntity && ((LivingEntity)focusedEntity).isSleeping()) {
                 Direction direction = ((LivingEntity)focusedEntity).getSleepingDirection();
                 this.setRotation(direction != null ? direction.asRotation() - 180.0f : 0.0f, 0.0f);
@@ -97,6 +98,4 @@ public abstract class CameraMixin {
         }
 
     }
-
-
 }
