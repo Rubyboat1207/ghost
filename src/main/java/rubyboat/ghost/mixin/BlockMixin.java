@@ -8,8 +8,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,7 +50,23 @@ public class BlockMixin {
             {
                 cir.setReturnValue(1.001F);
             }
+        }
+    }
 
+    @Inject(at = @At("HEAD"), method = "onEntityLand", cancellable = true)
+    public void onLandedUpon(BlockView world, Entity entity, CallbackInfo ci)
+    {
+        if (!entity.bypassesLandingEffects() && Config.getBouncy()) {
+            this.bounce(entity);
+            ci.cancel();
+        }
+    }
+
+    public void bounce(Entity entity){
+        Vec3d vec3d = entity.getVelocity();
+        if (vec3d.y < 0.0D) {
+            double d = entity instanceof LivingEntity ? 1.0D : 0.8D;
+            entity.setVelocity(vec3d.x, -vec3d.y * d, vec3d.z);
         }
     }
 }

@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -39,8 +40,11 @@ public abstract class ClientWorldMixin {
     {
         if(GhostClient.keyBinding.isPressed())
         {
-            BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
-            this.setBlockStateWithoutNeighborUpdates(suggestedBlockpos, Registry.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState());
+            if(client.player.isCreative() || (client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-1,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-2,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-3,0)).getBlock() != Blocks.AIR))
+            {
+                BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
+                this.setBlockStateWithoutNeighborUpdates(suggestedBlockpos, Registry.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState());
+            }
         }
         if(Config.time() != -1){
             this.setTimeOfDay(Config.time());
