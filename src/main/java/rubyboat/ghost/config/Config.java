@@ -17,6 +17,16 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 public class Config {
+    /*
+    Challenge Ideas:
+    Minecraft but only chunks I have been on render
+    Minecraft but only one block renders at a time
+
+    Notes:
+    BlockRenderManager Exists
+     */
+
+
     static String block = "diamond_block";
     static String camera_type = "";
     static int camera_distance = 10;
@@ -28,6 +38,7 @@ public class Config {
     static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
     static boolean bouncy = false;
+    static boolean antfarm = false;
     static String inPowderSnowEffect = "none";
     static Integer fog = 000000;
     static String title = "Minecraft";
@@ -113,6 +124,7 @@ public class Config {
     public static boolean isRender_legs(){return getConfig().render_legs;}
     public static boolean isRender_body(){return getConfig().render_body;}
     public static boolean isRender_head(){return getConfig().render_head;}
+    public static boolean isAntfarm(){return getConfig().antfarm;}
     public static float getModelOffset(){return getConfig().model_offset;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
@@ -199,6 +211,7 @@ public class Config {
         ConfigCategory texture = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.texture"));
         ConfigCategory biome = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.biome"));
         ConfigCategory time = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.time"));
+        ConfigCategory gamemodes = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.gamemodes"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
         DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.ghost_block"), Config.block)
@@ -218,7 +231,7 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.weather = newValue
                 );
         general.addEntry(blockmenu.build());
-        experimental.addEntry(cameramenu.build());
+        gamemodes.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
         {
             experimental.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.camera_distance"), Config.camera_distance, 0, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
@@ -263,6 +276,10 @@ public class Config {
         );
         texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_legs"), Config.render_legs)
                 .setSaveConsumer(newValue -> Config.render_legs = newValue)
+                .build()
+        );
+        gamemodes.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.AntFarm"), Config.antfarm)
+                .setSaveConsumer(newValue -> Config.antfarm = newValue)
                 .build()
         );
         texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_body"), Config.render_body)
@@ -330,6 +347,7 @@ public class Config {
         public boolean render_body;
         public boolean render_head;
         public boolean bouncy;
+        public boolean antfarm;
         public float model_offset;
         public Integer water;
         public Integer waterfog;
@@ -363,6 +381,7 @@ public class Config {
             this.water = Config.water;
             this.waterfog = Config.waterfog;
             this.bouncy = Config.bouncy;
+            this.antfarm = Config.antfarm;
 
         }
         public String serialized(){

@@ -128,7 +128,7 @@ public abstract class DebugHudMixin {
             LongSet longSet = world instanceof ServerWorld ? ((ServerWorld)world).getForcedChunks() : LongSets.EMPTY_SET;
             var10000 = new String[7];
             var10003 = SharedConstants.getGameVersion().getName();
-            var10000[0] = Config.getTitle() + var10003 + " (" + this.client.getGameVersion() + "/" + ClientBrandRetriever.getClientModName() + ("release".equalsIgnoreCase(this.client.getVersionType()) ? "" : "/" + this.client.getVersionType()) + ")";
+            var10000[0] = Config.getTitle() + " " + var10003 + " (" + this.client.getGameVersion() + "/" + ClientBrandRetriever.getClientModName() + ("release".equalsIgnoreCase(this.client.getVersionType()) ? "" : "/" + this.client.getVersionType()) + ")";
             var10000[1] = this.client.fpsDebugString;
             var10000[2] = string;
             var10000[3] = this.client.worldRenderer.getChunksDebugString();

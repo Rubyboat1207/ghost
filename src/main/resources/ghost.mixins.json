@@ -8,13 +8,16 @@
     "BlockMixin",
     "CameraMixin",
     "ClientWorldMixin",
-    "EndPortalRendererMixin",
-    "MinecraftClientMixin",
-    "PlayerRenderMixin",
     "DebugHudMixin",
-    "gameRendererMixin"
+    "EndPortalRendererMixin",
+    "gameRendererMixin",
+    "MinecraftClientMixin",
+    "PlayerRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "ClientPlayerEntityMixin"
+  ]
 }
