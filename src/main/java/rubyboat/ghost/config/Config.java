@@ -54,6 +54,8 @@ public class Config {
     static String weather = "";
     static Integer water = 0;
     static Integer waterfog = 0;
+    static String version = "";
+    static int distance = 0;
 
     public static String[] blocks = {
             "diamond_block",
@@ -134,6 +136,9 @@ public class Config {
     public static Integer grass(){return getConfig().grass;}
     public static Integer water(){return getConfig().water;}
     public static Integer waterfog(){return getConfig().waterfog;}
+    public static String getVersion(){return getConfig().version;}
+    public static Integer getDistance(){return getConfig().distance;}
+
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
     {
@@ -174,6 +179,7 @@ public class Config {
         Config.water = to_return.water;
         Config.waterfog = to_return.waterfog;
         Config.bouncy = to_return.bouncy;
+        Config.distance = to_return.distance;
         return to_return;
     }
 
@@ -321,6 +327,12 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.waterfog = newValue)
                 .setTooltip(new TranslatableText("tooltip.ghost.waterfog"))
                 .build());
+        general.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.version"), Config.version)
+                .setSaveConsumer(newValue -> Config.version = newValue)
+                .build());
+        general.addEntry(entryBuilder.startIntField(new TranslatableText("entry.ghost.distance"), Config.distance)
+                .setSaveConsumer(newValue -> Config.distance = newValue)
+                .build());
         //Build
         return builder;
     }
@@ -351,6 +363,8 @@ public class Config {
         public float model_offset;
         public Integer water;
         public Integer waterfog;
+        public String version;
+        public int distance;
 
         public int zoom_strength;
 
@@ -380,6 +394,8 @@ public class Config {
             this.model_offset = Config.model_offset;
             this.water = Config.water;
             this.waterfog = Config.waterfog;
+            this.version = Config.version;
+            this.distance = Config.distance;
             this.bouncy = Config.bouncy;
             this.antfarm = Config.antfarm;
 
