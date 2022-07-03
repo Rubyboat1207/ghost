@@ -13,6 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -61,18 +62,21 @@ public abstract class PlayerRenderMixin {
     @Inject(at = @At("RETURN"), method = "setModelPose", cancellable = true)
     private void renderArm(AbstractClientPlayerEntity player, CallbackInfo ci) {
         PlayerEntityModel<AbstractClientPlayerEntity> playerEntityModel = (PlayerEntityModel)(((PlayerEntityRenderer)(Object)this).getModel());
+        //-----arms
         if(!Config.isRender_arms())
         {
-            playerEntityModel.leftArm.visible = false;
-            playerEntityModel.rightArm.visible = false;
             playerEntityModel.leftSleeve.visible = false;
             playerEntityModel.rightSleeve.visible = false;
+            playerEntityModel.rightArm.visible = false;
+            playerEntityModel.leftArm.visible = false;
         }
+        //-----body
         if(!Config.isRender_body())
         {
             playerEntityModel.body.visible = false;
             playerEntityModel.jacket.visible = false;
         }
+        //-----legs
         if(!Config.isRender_legs())
         {
             playerEntityModel.leftLeg.visible = false;
@@ -80,11 +84,13 @@ public abstract class PlayerRenderMixin {
             playerEntityModel.leftPants.visible = false;
             playerEntityModel.rightPants.visible = false;
         }
+        //----head
         if(!Config.isRender_head())
         {
             playerEntityModel.head.visible = false;
             playerEntityModel.hat.visible = false;
         }
+
     }
 
 }

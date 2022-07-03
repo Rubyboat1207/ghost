@@ -1,80 +1,42 @@
 package rubyboat.ghost.mixin;
 
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.UnmodifiableIterator;
-import com.mojang.blaze3d.platform.GlDebugInfo;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.DataFixUtils;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+
 import net.minecraft.SharedConstants;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderEffect;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.MetricsData;
-import net.minecraft.util.Util;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.AffineTransformation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.*;
 import net.minecraft.world.Heightmap.Type;
-import net.minecraft.world.SpawnHelper.Info;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
-import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.gui.hud.DebugHud;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -83,9 +45,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import rubyboat.ghost.client.GhostClient;
 import rubyboat.ghost.config.Config;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Mixin(DebugHud.class)
 public abstract class DebugHudMixin {
@@ -169,7 +128,7 @@ public abstract class DebugHudMixin {
             LongSet longSet = world instanceof ServerWorld ? ((ServerWorld)world).getForcedChunks() : LongSets.EMPTY_SET;
             var10000 = new String[7];
             var10003 = SharedConstants.getGameVersion().getName();
-            var10000[0] = "Minecraft " + var10003 + " (" + this.client.getGameVersion() + "/" + ClientBrandRetriever.getClientModName() + ("release".equalsIgnoreCase(this.client.getVersionType()) ? "" : "/" + this.client.getVersionType()) + ")";
+            var10000[0] = Config.getTitle() + " " + var10003 + " (" + this.client.getGameVersion() + "/" + ClientBrandRetriever.getClientModName() + ("release".equalsIgnoreCase(this.client.getVersionType()) ? "" : "/" + this.client.getVersionType()) + ")";
             var10000[1] = this.client.fpsDebugString;
             var10000[2] = string;
             var10000[3] = this.client.worldRenderer.getChunksDebugString();
@@ -188,7 +147,7 @@ public abstract class DebugHudMixin {
             list.add("");
             list.add(String.format(Locale.ROOT, "XYZ: %.3f / " + (!Config.isCyrusMode() ? GhostClient.roundTo((float) this.client.getCameraEntity().getY(), 3) : (this.client.getCameraEntity().getY() > 320 ? "Build Height+ ( "+ GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3) + " )" : GhostClient.roundTo((float) this.client.getCameraEntity().getY() + 64f, 3))) +  " / %.3f", this.client.getCameraEntity().getX(), this.client.getCameraEntity().getZ()));
             list.add(String.format("Block: %d %d %d", blockPos.getX(), blockPos.getY(), blockPos.getZ()));
-            list.add(String.format("Chunk: %d %d %d in %d %d %d", blockPos.getX() & 15, blockPos.getY() & 15, blockPos.getZ() & 15, ChunkSectionPos.getSectionCoord(blockPos.getX()), ChunkSectionPos.getSectionCoord(blockPos.getY()), ChunkSectionPos.getSectionCoord(blockPos.getZ())));
+            list.add(String.format("Chunk: %d %d %d [%d %d in r.%d.%d.mca]", chunkPos.x, ChunkSectionPos.getSectionCoord(blockPos.getY()), chunkPos.z, chunkPos.getRegionRelativeX(), chunkPos.getRegionRelativeZ(), chunkPos.getRegionX(), chunkPos.getRegionZ()));
             list.add(String.format(Locale.ROOT, "Facing: %s (%s) (%.1f / %.1f)", direction, string2, MathHelper.wrapDegrees(entity.getYaw()), MathHelper.wrapDegrees(entity.getPitch())));
             WorldChunk worldChunk = this.getClientChunk();
             int m;
@@ -233,7 +192,7 @@ public abstract class DebugHudMixin {
                 list.add(stringBuilder.toString());
                 if (blockPos.getY() >= this.client.world.getBottomY() && blockPos.getY() < this.client.world.getTopY()) {
                     Registry var27 = this.client.world.getRegistryManager().get(Registry.BIOME_KEY);
-                    Biome var10002 = this.client.world.getBiome(blockPos);
+                    RegistryEntry<Biome> var10002 = this.client.world.getBiome(blockPos);
                     list.add("Biome: " + var27.getId(var10002));
                     long l = 0L;
                     float h = 0.0F;

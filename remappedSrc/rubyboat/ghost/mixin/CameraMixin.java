@@ -7,10 +7,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
@@ -61,18 +58,19 @@ public abstract class CameraMixin {
         {
             if(!Config.getCamera_type().equalsIgnoreCase("choppy"))
             {
-                this.setRotation(focusedEntity.getYaw(tickDelta), focusedEntity.getPitch(tickDelta));
-                this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) + (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
+                this.setRotation(Config.isAntfarm() ? 90 : focusedEntity.getYaw(tickDelta), Config.isAntfarm() ? 0 : focusedEntity.getPitch(tickDelta));
+                this.setPos(MathHelper.lerp((double)tickDelta, Config.isAntfarm() ? focusedEntity.getX() + 3  : focusedEntity.prevX, Config.isAntfarm() ? focusedEntity.getX() + 3  : focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) + (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
             }else
             {
-                this.setRotation(focusedEntity.getYaw(), focusedEntity.getPitch());
-                this.setPos(focusedEntity.getX(), focusedEntity.prevY + this.cameraY, focusedEntity.getZ());
+                this.setRotation(Config.isAntfarm() ? 0 : focusedEntity.getYaw(), Config.isAntfarm() ? 0 : focusedEntity.getPitch());
+                this.setPos(Config.isAntfarm() ? focusedEntity.getX() + 3 : focusedEntity.getX(), focusedEntity.prevY + this.cameraY, focusedEntity.getZ());
             }
             if (thirdPerson) {
                 if (inverseView) {
                     this.setRotation(this.yaw + 180.0f, -this.pitch);
                 }
-                this.moveBy(-this.clipToSpace(4.0), 0.0, 0.0);
+
+                this.moveBy(-this.clipToSpace(Config.getDistance()), 0.0, 0.0);
             } else if (focusedEntity instanceof LivingEntity && ((LivingEntity)focusedEntity).isSleeping()) {
                 Direction direction = ((LivingEntity)focusedEntity).getSleepingDirection();
                 this.setRotation(direction != null ? direction.asRotation() - 180.0f : 0.0f, 0.0f);
@@ -97,6 +95,4 @@ public abstract class CameraMixin {
         }
 
     }
-
-
 }

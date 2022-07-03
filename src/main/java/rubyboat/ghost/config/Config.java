@@ -8,7 +8,8 @@ import me.shedaniel.clothconfig2.impl.builders.ColorFieldBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,12 +51,31 @@ public class Config {
     static boolean render_legs = true;
     static boolean render_body = true;
     static boolean render_head = true;
+    static boolean technoblade = true;
+    static float arms_size = 1;
+    static float legs_size = 1;
+    static float body_size = 1;
+    static float head_size = 1;
     static float model_offset = 0;
     static String weather = "";
     static Integer water = 0;
     static Integer waterfog = 0;
     static String version = "";
     static int distance = 0;
+    //getters for size changers
+    public static float getArms_size() {
+        return arms_size;
+    }
+    public static float getLegs_size() {
+        return legs_size;
+    }
+    public static float getBody_size() {
+        return body_size;
+    }
+    public static float getHead_size() {
+        return head_size;
+    }
+
 
     public static String[] blocks = {
             "diamond_block",
@@ -119,6 +139,10 @@ public class Config {
     {
         return getConfig().bouncy;
     }
+    public static boolean isTechnoblade()
+    {
+        return getConfig().technoblade;
+    }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
@@ -126,7 +150,7 @@ public class Config {
     public static boolean isRender_legs(){return getConfig().render_legs;}
     public static boolean isRender_body(){return getConfig().render_body;}
     public static boolean isRender_head(){return getConfig().render_head;}
-    public static boolean isAntfarm(){return getConfig().antfarm;}
+    public static boolean isAntfarm(){return false;}
     public static float getModelOffset(){return getConfig().model_offset;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
@@ -180,6 +204,7 @@ public class Config {
         Config.waterfog = to_return.waterfog;
         Config.bouncy = to_return.bouncy;
         Config.distance = to_return.distance;
+        Config.technoblade = to_return.technoblade;
         return to_return;
     }
 
@@ -200,10 +225,11 @@ public class Config {
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(MinecraftClient.getInstance().currentScreen)
-                .setTitle(new TranslatableText("title.ghost.config"));
+                .setTitle(Text.translatable("title.ghost.config"));
         builder.setSavingRunnable(() -> {
             SerializedConfig config = new SerializedConfig();
             MinecraftClient.getInstance().worldRenderer.reload();
+            MinecraftClient.getInstance().reloadResources();
             try {
                 Files.writeString(Path.of(path), config.serialized());
             } catch (IOException e) {
@@ -212,26 +238,26 @@ public class Config {
             Config.config = loadConfig();
         });
 
-        ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.general"));
-        ConfigCategory experimental = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.experimental"));
-        ConfigCategory texture = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.texture"));
-        ConfigCategory biome = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.biome"));
-        ConfigCategory time = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.time"));
-        ConfigCategory gamemodes = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.gamemodes"));
+        ConfigCategory general = builder.getOrCreateCategory(Text.translatable("config_category.ghost.general"));
+        ConfigCategory experimental = builder.getOrCreateCategory(Text.translatable("config_category.ghost.experimental"));
+        ConfigCategory texture = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
+        ConfigCategory biome = builder.getOrCreateCategory(Text.translatable("config_category.ghost.biome"));
+        ConfigCategory time = builder.getOrCreateCategory(Text.translatable("config_category.ghost.time"));
+        ConfigCategory gamemodes = builder.getOrCreateCategory(Text.translatable("config_category.ghost.gamemodes"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
-        DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.ghost_block"), Config.block)
+        DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.ghost_block"), Config.block)
                 .setSelections(Arrays.asList(blocks))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.block = newValue
                 );
-        DropdownMenuBuilder<String> cameramenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.camera_type"), Config.camera_type)
+        DropdownMenuBuilder<String> cameramenu = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.camera_type"), Config.camera_type)
                 .setSelections(Arrays.asList(camera_modes))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.camera_type = newValue
                 );
 
-        DropdownMenuBuilder<String> weather = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.weather"), Config.weather)
+        DropdownMenuBuilder<String> weather = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.weather"), Config.weather)
                 .setSelections(Arrays.asList(downfall))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.weather = newValue
@@ -240,97 +266,105 @@ public class Config {
         gamemodes.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
         {
-            experimental.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.camera_distance"), Config.camera_distance, 0, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
+            experimental.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.camera_distance"), Config.camera_distance, 3, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
         }
-        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
-        texture.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.player_texture"), Config.player_texture)
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
+        texture.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.player_texture"), Config.player_texture)
                 .setSaveConsumer(newValue -> Config.player_texture = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.player_texture"))
+                .setTooltip(Text.translatable("tooltip.ghost.player_texture"))
                 .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
-        general.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.color"), Config.color)
+        //Update Model Visibility
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_arms"), Config.render_arms)
+                .setSaveConsumer(newValue -> Config.render_arms = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_legs"), Config.render_legs)
+                .setSaveConsumer(newValue -> Config.render_legs = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_body"), Config.render_body)
+                .setSaveConsumer(newValue -> Config.render_body = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_head"), Config.render_head)
+                .setSaveConsumer(newValue -> Config.render_head = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.technoblade"), Config.technoblade)
+                .setSaveConsumer(newValue -> Config.technoblade = newValue)
+                .setTooltip(Text.translatable("tooltip.ghost.technoblade"))
+                .build()
+        );
+
+        /*gamemodes.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.AntFarm"), Config.antfarm)
+                .setSaveConsumer(newValue -> Config.antfarm = newValue)
+                .build()
+        );*/
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
+        general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
+        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.color"), Config.color)
                 .setSaveConsumer(newValue -> Config.color = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.color"))
+                .setTooltip(Text.translatable("tooltip.ghost.color"))
                 .build());
-        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
+        experimental.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.fog"), Config.fog)
+        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.fog"), Config.fog)
                 .setSaveConsumer(newValue -> Config.fog = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.fog"))
+                .setTooltip(Text.translatable("tooltip.ghost.fog"))
                 .build());
-        DropdownMenuBuilder<String> snow = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.snow"), Config.inPowderSnowEffect)
+        DropdownMenuBuilder<String> snow = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.snow"), Config.inPowderSnowEffect)
                 .setSelections(Arrays.asList(effects))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
                 );
 
-       biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.leaf"), Config.leaf)
+       biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.leaf"), Config.leaf)
                 .setSaveConsumer(newValue -> Config.leaf = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.leaf"))
+                .setTooltip(Text.translatable("tooltip.ghost.leaf"))
                 .build());
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.grass"), Config.grass)
+        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.grass"), Config.grass)
                 .setSaveConsumer(newValue -> Config.grass = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.grass"))
+                .setTooltip(Text.translatable("tooltip.ghost.grass"))
                 .build());
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_arms"), Config.render_arms)
-                .setSaveConsumer(newValue -> Config.render_arms = newValue)
-                .build()
-        );
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_legs"), Config.render_legs)
-                .setSaveConsumer(newValue -> Config.render_legs = newValue)
-                .build()
-        );
-        gamemodes.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.AntFarm"), Config.antfarm)
-                .setSaveConsumer(newValue -> Config.antfarm = newValue)
-                .build()
-        );
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_body"), Config.render_body)
-                .setSaveConsumer(newValue -> Config.render_body = newValue)
-                .build()
-        );
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.render_head"), Config.render_head)
-                .setSaveConsumer(newValue -> Config.render_head = newValue)
-                .build()
-        );
-        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.bouncy"), Config.bouncy)
+
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.bouncy"), Config.bouncy)
                 .setSaveConsumer(newValue -> Config.bouncy = newValue)
                 .build()
         );
         texture.addEntry(snow.build());
-        time.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.time"), Config.time, -1 , 24000)
+        time.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), Config.time, -1 , 24000)
                 .setDefaultValue(0)
                 .setMin(-1)
                 .setMax(24000)
-                .setTooltip(new TranslatableText("tooltip.ghost.time"))
+                .setTooltip(Text.translatable("tooltip.ghost.time"))
                 .setSaveConsumer(newValue -> Config.time = newValue)
                 .build()
         );
-        general.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.zoom_strength"), Config.zoom_strength, 50 , 95)
+        general.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.zoom_strength"), Config.zoom_strength, 50 , 95)
                 .setDefaultValue(0)
                 .setMin(50)
                 .setMax(95)
                 .setSaveConsumer(newValue -> Config.zoom_strength = newValue)
                 .build()
         );
-        texture.addEntry(entryBuilder.startFloatField(new TranslatableText("entry.ghost.playerModelOffset"), Config.model_offset)
+        texture.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.player_model_offset"), Config.model_offset)
                 .setSaveConsumer(newValue -> Config.model_offset = newValue)
                 .build());
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.water"), Config.water)
+        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.water"), Config.water)
                 .setSaveConsumer(newValue -> Config.water = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.water"))
+                .setTooltip(Text.translatable("tooltip.ghost.water"))
                 .build());
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.waterfog"), Config.waterfog)
+        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.waterfog"), Config.waterfog)
                 .setSaveConsumer(newValue -> Config.waterfog = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.waterfog"))
+                .setTooltip(Text.translatable("tooltip.ghost.waterfog"))
                 .build());
-        general.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.version"), Config.version)
+        general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.version"), Config.version)
                 .setSaveConsumer(newValue -> Config.version = newValue)
                 .build());
-        general.addEntry(entryBuilder.startIntField(new TranslatableText("entry.ghost.distance"), Config.distance)
+        general.addEntry(entryBuilder.startIntField(Text.translatable("entry.ghost.distance"), Config.distance)
                 .setSaveConsumer(newValue -> Config.distance = newValue)
                 .build());
         //Build
@@ -358,6 +392,11 @@ public class Config {
         public boolean render_legs;
         public boolean render_body;
         public boolean render_head;
+        public boolean technoblade;
+        float arms_size;
+        float legs_size;
+        float body_size;
+        float head_size;
         public boolean bouncy;
         public boolean antfarm;
         public float model_offset;
@@ -391,6 +430,10 @@ public class Config {
             this.render_legs = Config.render_legs;
             this.render_body = Config.render_body;
             this.render_head = Config.render_head;
+            this.arms_size = Config.arms_size;
+            this.legs_size = Config.legs_size;
+            this.body_size = Config.body_size;
+            this.head_size = Config.head_size;
             this.model_offset = Config.model_offset;
             this.water = Config.water;
             this.waterfog = Config.waterfog;
@@ -398,7 +441,7 @@ public class Config {
             this.distance = Config.distance;
             this.bouncy = Config.bouncy;
             this.antfarm = Config.antfarm;
-
+            this.technoblade = Config.technoblade;
         }
         public String serialized(){
             return new Gson().toJson(this);

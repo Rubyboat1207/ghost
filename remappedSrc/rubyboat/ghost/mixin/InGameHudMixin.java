@@ -30,13 +30,13 @@ public abstract class InGameHudMixin {
     public void renderStatusBars(MatrixStack matrices, CallbackInfo ci){
         PlayerEntity playerEntity = this.getCameraPlayer();
         if (playerEntity != null) {
-            if(Config.is_thirst())
+            /*if(Config.is_thirst())
             {
                 String to_print = "Thirst: ";
                 //MatrixStack matrices, TextRenderer textRenderer, String text, int centerX, int y, int color
                 int k = (this.scaledWidth - this.getTextRenderer().getWidth(to_print)) / 2;
                 this.getTextRenderer().draw(matrices, "Thirst: ", k, this.scaledHeight - 100, 0x00aaff);
-            }
+            }*/
         }
     }
 }

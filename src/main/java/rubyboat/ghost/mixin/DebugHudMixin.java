@@ -34,6 +34,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.noise.NoiseConfig;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
@@ -210,16 +211,18 @@ public abstract class DebugHudMixin {
             if (serverWorld != null) {
                 ServerChunkManager serverChunkManager = serverWorld.getChunkManager();
                 ChunkGenerator chunkGenerator = serverChunkManager.getChunkGenerator();
-                MultiNoiseUtil.MultiNoiseSampler multiNoiseSampler = chunkGenerator.getMultiNoiseSampler();
+                NoiseConfig noiseConfig = serverChunkManager.getNoiseConfig();
+                chunkGenerator.getDebugHudText(list, noiseConfig, blockPos);
+                MultiNoiseUtil.MultiNoiseSampler multiNoiseSampler = noiseConfig.getMultiNoiseSampler();
                 BiomeSource biomeSource = chunkGenerator.getBiomeSource();
                 biomeSource.addDebugInfo(list, blockPos, multiNoiseSampler);
                 SpawnHelper.Info info = serverChunkManager.getSpawnInfo();
                 if (info != null) {
                     Object2IntMap<SpawnGroup> object2IntMap = info.getGroupToCount();
-                    m = info.getSpawningChunkCount();
-                    list.add("SC: " + m + ", " + (String) Stream.of(SpawnGroup.values()).map((group) -> {
-                        char var10002 = Character.toUpperCase(group.getName().charAt(0));
-                        return var10002 + ": " + object2IntMap.getInt(group);
+                    int l = info.getSpawningChunkCount();
+                    list.add("SC: " + l + ", " + (String)Stream.of(SpawnGroup.values()).map((group) -> {
+                        char var10444 = Character.toUpperCase(group.getName().charAt(0));
+                        return var10444 + ": " + object2IntMap.getInt(group);
                     }).collect(Collectors.joining(", ")));
                 } else {
                     list.add("SC: N/A");

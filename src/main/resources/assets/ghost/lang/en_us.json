@@ -5,6 +5,7 @@
   "key.ghost.menu": "Open Menu",
   "title.ghost.config": "Ghost Config",
   "config_category.ghost.general": "General Options",
+  "config_category.ghost.challenges": "Challenges",
   "config_category.ghost.experimental": "Experimental Options",
   "config_category.ghost.texture": "Model/Texture Options",
   "entry.ghost.ghost_block": "Ghost block Block type",
@@ -43,6 +44,9 @@
   "tooltip.ghost.water": "Base value: 000000",
   "entry.ghost.waterfog":"Water Fog Color",
   "tooltip.ghost.waterfog": "Base value: 000000",
+  "entry.ghost.technoblade":"Technoblade",
+  "entry.ghost.player_model_offset":"Player Model Offset",
+  "tooltip.ghost.technoblade": "Adds crowns to all pigs, RIP Techno",
   "entry.ghost.version": "Minecraft Version",
   "entry.ghost.distance": "Zoom Out Camera Distance"
 }

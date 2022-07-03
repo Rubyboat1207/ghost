@@ -32,11 +32,11 @@ import java.util.Random;
 public abstract class ClientWorldMixin {
     @Shadow @Final private MinecraftClient client;
 
-    @Shadow public abstract void setBlockStateWithoutNeighborUpdates(BlockPos pos, BlockState state);
-
     @Shadow public abstract void setTimeOfDay(long timeOfDay);
 
     @Shadow public abstract ClientChunkManager getChunkManager();
+
+    @Shadow public abstract boolean setBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth);
 
     @Inject(at = @At("HEAD"), method = "tick")
     public void tick(CallbackInfo ci)
@@ -46,7 +46,7 @@ public abstract class ClientWorldMixin {
             if(client.player.isCreative() || (client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-1,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-2,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-3,0)).getBlock() != Blocks.AIR))
             {
                 BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
-                this.setBlockStateWithoutNeighborUpdates(suggestedBlockpos, Registry.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState());
+                this.setBlockState(suggestedBlockpos, Registry.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState(), 0, 0);
             }
         }
         if(Config.isAntfarm())
@@ -58,7 +58,7 @@ public abstract class ClientWorldMixin {
                 {
                     for(BlockPos block : BlockPos.iterate(pos.add(-9,-10,-20), pos.add(10,10,20)))
                     {
-                        setBlockStateWithoutNeighborUpdates(block, Blocks.AIR.getDefaultState());
+                        setBlockState(block, Blocks.AIR.getDefaultState(), 0, 0);
                     }
                     break;
                 }
@@ -66,8 +66,6 @@ public abstract class ClientWorldMixin {
 
 
         }
-        if(Config.time() != -1){
-            this.setTimeOfDay(Config.time());
-        }
     }
+
 }

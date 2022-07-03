@@ -7,17 +7,19 @@
     "BiomeMixin",
     "BlockMixin",
     "CameraMixin",
+    "ClientPlayerEntityMixin",
     "ClientWorldMixin",
     "DebugHudMixin",
     "EndPortalRendererMixin",
     "gameRendererMixin",
     "MinecraftClientMixin",
+    "PigEntityModelMixin",
     "PlayerRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "ClientPlayerEntityMixin"
+    "ClientWorldPropertiesMixin"
   ]
 }

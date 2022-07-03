@@ -4,10 +4,11 @@ import com.google.gson.Gson;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.ColorFieldBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.TranslatableText;
-
+import net.minecraft.text.TranslatableTextContent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,28 +16,52 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 public class Config {
+    /*
+    Challenge Ideas:
+    Minecraft but only chunks I have been on render
+    Minecraft but only one block renders at a time
+
+    Notes:
+    BlockRenderManager Exists
+     */
+
+
     static String block = "diamond_block";
     static String camera_type = "";
     static int camera_distance = 10;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
-    static String player_texture = "";
+    static String player_texture = "none";
     static boolean is_sleeve = true;
-    static boolean is_cyrus_mode = false;
-    static boolean is_thirst = false;
+    static int zoom_strength = 75;
+    static boolean is_cyrus_mode = true;
     static boolean inNetherPortalEffect = false;
+    static boolean bouncy = false;
+    static boolean antfarm = false;
     static String inPowderSnowEffect = "none";
     static Integer fog = 000000;
-    static String title = "";
+    static String title = "Minecraft";
     static Integer color = 0;
+    static Integer time = 0;
+    static Integer leaf = 0;
+    static Integer grass = 0;
+    static boolean render_arms = true;
+    static boolean render_legs = true;
+    static boolean render_body = true;
+    static boolean render_head = true;
+    static float model_offset = 0;
+    static String weather = "";
+    static Integer water = 0;
+    static Integer waterfog = 0;
+    static String version = "";
+    static int distance = 0;
 
     public static String[] blocks = {
             "diamond_block",
             "bedrock",
             "dirt",
             "pink_wool",
-            "polished_andesite",
-            "dried_kelp"
+            "polished_andesite"
     };
     public static String[] camera_modes = {
             "normal",
@@ -49,6 +74,13 @@ public class Config {
             "water",
             "lava"
     };
+    public static String[] downfall = {
+            "none",
+            "rain",
+            "thunder",
+            "snow",
+            "test"
+    };
 
     public static String getBlock()
     {
@@ -57,6 +89,9 @@ public class Config {
     public static String getCamera_type()
     {
         return Arrays.asList(camera_modes).contains(getConfig().camera_type) ? getConfig().camera_type : "normal";
+    }
+    public static String getWeather(){
+        return Arrays.asList(downfall).contains(getConfig().weather) ? getConfig().weather : "none";
     }
 
     public static boolean isSlippery()
@@ -71,13 +106,38 @@ public class Config {
     {
         return getConfig().camera_distance;
     }
+    public static String getTitle()
+    {
+        return getConfig().title;
+    }
+    public static int getZoomStrength()
+    {
+        return getConfig().zoom_strength;
+    }
+    public static boolean getBouncy()
+    {
+        return getConfig().bouncy;
+    }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
-    public static boolean is_thirst(){return getConfig().is_thirst;}
     public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
+    public static boolean isRender_arms(){return getConfig().render_arms;}
+    public static boolean isRender_legs(){return getConfig().render_legs;}
+    public static boolean isRender_body(){return getConfig().render_body;}
+    public static boolean isRender_head(){return getConfig().render_head;}
+    public static boolean isAntfarm(){return false;}
+    public static float getModelOffset(){return getConfig().model_offset;}
     public static String title(){return getConfig().title;}
     public static Integer color(){return getConfig().biomecolor;}
     public static Integer fog(){return getConfig().fog;}
+    public static Integer time(){return getConfig().time;}
+    public static Integer leaf(){return getConfig().leaf;}
+    public static Integer grass(){return getConfig().grass;}
+    public static Integer water(){return getConfig().water;}
+    public static Integer waterfog(){return getConfig().waterfog;}
+    public static String getVersion(){return getConfig().version;}
+    public static Integer getDistance(){return getConfig().distance;}
+
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
     {
@@ -105,7 +165,20 @@ public class Config {
         Config.title = to_return.title;
         Config.color = to_return.biomecolor;
         Config.is_cyrus_mode = to_return.is_cyrus_mode;
-        Config.is_thirst = to_return.is_thirst;
+        Config.time = to_return.time;
+        Config.leaf = to_return.leaf;
+        Config.grass = to_return.grass;
+        Config.weather = to_return.weather;
+        Config.zoom_strength = to_return.zoom_strength;
+        Config.render_arms = to_return.render_arms;
+        Config.render_legs = to_return.render_legs;
+        Config.render_body = to_return.render_body;
+        Config.render_head = to_return.render_head;
+        Config.model_offset = to_return.model_offset;
+        Config.water = to_return.water;
+        Config.waterfog = to_return.waterfog;
+        Config.bouncy = to_return.bouncy;
+        Config.distance = to_return.distance;
         return to_return;
     }
 
@@ -126,9 +199,10 @@ public class Config {
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(MinecraftClient.getInstance().currentScreen)
-                .setTitle(new TranslatableText("title.ghost.config"));
+                .setTitle(new TranslatableTextContent("title.ghost.config"));
         builder.setSavingRunnable(() -> {
             SerializedConfig config = new SerializedConfig();
+            MinecraftClient.getInstance().worldRenderer.reload();
             try {
                 Files.writeString(Path.of(path), config.serialized());
             } catch (IOException e) {
@@ -137,59 +211,127 @@ public class Config {
             Config.config = loadConfig();
         });
 
-        ConfigCategory general = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.general"));
-        ConfigCategory experimental = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.experimental"));
-        ConfigCategory texture = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.texture"));
-        ConfigCategory challenges = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.challenges"));
-        ConfigCategory biome = builder.getOrCreateCategory(new TranslatableText("config_category.ghost.biome"));
+        ConfigCategory general = builder.getOrCreateCategory(new TranslatableTextContent("config_category.ghost.general"));
+        ConfigCategory experimental = builder.getOrCreateCategory(new TranslatableTextContent("config_category.ghost.experimental"));
+        ConfigCategory texture = builder.getOrCreateCategory(new TranslatableTextContent("config_category.ghost.texture"));
+        ConfigCategory biome = builder.getOrCreateCategory(new TranslatableTextContent("config_category.ghost.biome"));
+        ConfigCategory time = builder.getOrCreateCategory(new TranslatableTextContent("config_category.ghost.time"));
+        ConfigCategory gamemodes = builder.getOrCreateCategory(new TranslatableTextContent("config_category.ghost.gamemodes"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
-        DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.ghost_block"), Config.block)
+        DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(new TranslatableTextContent("entry.ghost.ghost_block"), Config.block)
                 .setSelections(Arrays.asList(blocks))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.block = newValue
                 );
-        DropdownMenuBuilder<String> cameramenu = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.camera_type"), Config.camera_type)
+        DropdownMenuBuilder<String> cameramenu = entryBuilder.startStringDropdownMenu(new TranslatableTextContent("entry.ghost.camera_type"), Config.camera_type)
                 .setSelections(Arrays.asList(camera_modes))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.camera_type = newValue
                 );
+
+        DropdownMenuBuilder<String> weather = entryBuilder.startStringDropdownMenu(new TranslatableTextContent("entry.ghost.weather"), Config.weather)
+                .setSelections(Arrays.asList(downfall))
+                .setSuggestionMode(false)
+                .setSaveConsumer(newValue -> Config.weather = newValue
+                );
         general.addEntry(blockmenu.build());
-        experimental.addEntry(cameramenu.build());
+        gamemodes.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
         {
-            experimental.addEntry(entryBuilder.startIntSlider(new TranslatableText("entry.ghost.camera_distance"), Config.camera_distance, 0, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
+            experimental.addEntry(entryBuilder.startIntSlider(new TranslatableTextContent("entry.ghost.camera_distance"), Config.camera_distance, 0, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
         }
-        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
-        texture.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.player_texture"), Config.player_texture)
+        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
+        texture.addEntry(entryBuilder.startStrField(new TranslatableTextContent("entry.ghost.player_texture"), Config.player_texture)
                 .setSaveConsumer(newValue -> Config.player_texture = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.player_texture"))
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.player_texture"))
                 .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
-        general.addEntry(entryBuilder.startStrField(new TranslatableText("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.color"), Config.color)
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
+        general.addEntry(entryBuilder.startStrField(new TranslatableTextContent("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
+        biome.addEntry(entryBuilder.startColorField(new TranslatableTextContent("entry.ghost.color"), Config.color)
                 .setSaveConsumer(newValue -> Config.color = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.color"))
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.color"))
                 .build());
-        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
+        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
-        experimental.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("entry.ghost.thirst"), Config.is_cyrus_mode)
-                .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
-                .build()
-        );
-        biome.addEntry(entryBuilder.startColorField(new TranslatableText("entry.ghost.fog"), Config.fog)
+        biome.addEntry(entryBuilder.startColorField(new TranslatableTextContent("entry.ghost.fog"), Config.fog)
                 .setSaveConsumer(newValue -> Config.fog = newValue)
-                .setTooltip(new TranslatableText("tooltip.ghost.fog"))
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.fog"))
                 .build());
-        DropdownMenuBuilder<String> snow = entryBuilder.startStringDropdownMenu(new TranslatableText("entry.ghost.snow"), Config.inPowderSnowEffect)
+        DropdownMenuBuilder<String> snow = entryBuilder.startStringDropdownMenu(new TranslatableTextContent("entry.ghost.snow"), Config.inPowderSnowEffect)
                 .setSelections(Arrays.asList(effects))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
                 );
+
+       biome.addEntry(entryBuilder.startColorField(new TranslatableTextContent("entry.ghost.leaf"), Config.leaf)
+                .setSaveConsumer(newValue -> Config.leaf = newValue)
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.leaf"))
+                .build());
+        biome.addEntry(entryBuilder.startColorField(new TranslatableTextContent("entry.ghost.grass"), Config.grass)
+                .setSaveConsumer(newValue -> Config.grass = newValue)
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.grass"))
+                .build());
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.render_arms"), Config.render_arms)
+                .setSaveConsumer(newValue -> Config.render_arms = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.render_legs"), Config.render_legs)
+                .setSaveConsumer(newValue -> Config.render_legs = newValue)
+                .build()
+        );
+        gamemodes.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.AntFarm"), Config.antfarm)
+                .setSaveConsumer(newValue -> Config.antfarm = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.render_body"), Config.render_body)
+                .setSaveConsumer(newValue -> Config.render_body = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.render_head"), Config.render_head)
+                .setSaveConsumer(newValue -> Config.render_head = newValue)
+                .build()
+        );
+        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableTextContent("entry.ghost.bouncy"), Config.bouncy)
+                .setSaveConsumer(newValue -> Config.bouncy = newValue)
+                .build()
+        );
         texture.addEntry(snow.build());
+        time.addEntry(entryBuilder.startIntSlider(new TranslatableTextContent("entry.ghost.time"), Config.time, -1 , 24000)
+                .setDefaultValue(0)
+                .setMin(-1)
+                .setMax(24000)
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.time"))
+                .setSaveConsumer(newValue -> Config.time = newValue)
+                .build()
+        );
+        general.addEntry(entryBuilder.startIntSlider(new TranslatableTextContent("entry.ghost.zoom_strength"), Config.zoom_strength, 50 , 95)
+                .setDefaultValue(0)
+                .setMin(50)
+                .setMax(95)
+                .setSaveConsumer(newValue -> Config.zoom_strength = newValue)
+                .build()
+        );
+        texture.addEntry(entryBuilder.startFloatField(new TranslatableTextContent("entry.ghost.playerModelOffset"), Config.model_offset)
+                .setSaveConsumer(newValue -> Config.model_offset = newValue)
+                .build());
+        biome.addEntry(entryBuilder.startColorField(new TranslatableTextContent("entry.ghost.water"), Config.water)
+                .setSaveConsumer(newValue -> Config.water = newValue)
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.water"))
+                .build());
+        biome.addEntry(entryBuilder.startColorField(new TranslatableTextContent("entry.ghost.waterfog"), Config.waterfog)
+                .setSaveConsumer(newValue -> Config.waterfog = newValue)
+                .setTooltip(new TranslatableTextContent("tooltip.ghost.waterfog"))
+                .build());
+        general.addEntry(entryBuilder.startStrField(new TranslatableTextContent("entry.ghost.version"), Config.version)
+                .setSaveConsumer(newValue -> Config.version = newValue)
+                .build());
+        general.addEntry(entryBuilder.startIntField(new TranslatableTextContent("entry.ghost.distance"), Config.distance)
+                .setSaveConsumer(newValue -> Config.distance = newValue)
+                .build());
         //Build
         return builder;
     }
@@ -206,8 +348,24 @@ public class Config {
         public String title;
         public Integer biomecolor;
         public Integer fog;
-        public boolean is_thirst;
         public boolean is_cyrus_mode;
+        public Integer time;
+        public Integer leaf;
+        public Integer grass;
+        public String weather;
+        public boolean render_arms;
+        public boolean render_legs;
+        public boolean render_body;
+        public boolean render_head;
+        public boolean bouncy;
+        public boolean antfarm;
+        public float model_offset;
+        public Integer water;
+        public Integer waterfog;
+        public String version;
+        public int distance;
+
+        public int zoom_strength;
 
         public SerializedConfig()
         {
@@ -223,7 +381,22 @@ public class Config {
             this.biomecolor = Config.color;
             this.fog = Config.fog;
             this.is_cyrus_mode = Config.is_cyrus_mode;
-            this.is_thirst = Config.is_thirst;
+            this.time = Config.time;
+            this.leaf = Config.leaf;
+            this.grass = Config.grass;
+            this.weather = Config.weather;
+            this.zoom_strength = Config.zoom_strength;
+            this.render_arms = Config.render_arms;
+            this.render_legs = Config.render_legs;
+            this.render_body = Config.render_body;
+            this.render_head = Config.render_head;
+            this.model_offset = Config.model_offset;
+            this.water = Config.water;
+            this.waterfog = Config.waterfog;
+            this.version = Config.version;
+            this.distance = Config.distance;
+            this.bouncy = Config.bouncy;
+            this.antfarm = Config.antfarm;
 
         }
         public String serialized(){
