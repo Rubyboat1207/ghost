@@ -14,12 +14,11 @@
     "gameRendererMixin",
     "MinecraftClientMixin",
     "PigEntityModelMixin",
-    "PlayerRenderMixin"
+    "PlayerRenderMixin",
+    "ClientWorldPropertiesMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "ClientWorldPropertiesMixin"
-  ]
+  }
 }
