@@ -10,13 +10,11 @@
     "ClientPlayerEntityMixin",
     "ClientWorldMixin",
     "DebugHudMixin",
-    "EndPortalRendererMixin",
     "gameRendererMixin",
     "MinecraftClientMixin",
     "PigEntityModelMixin",
     "PlayerRenderMixin",
     "ClientWorldPropertiesMixin"
-
   ],
   "injectors": {
     "defaultRequire": 1

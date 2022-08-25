@@ -1,18 +1,12 @@
 package rubyboat.ghost.mixin;
 
-import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -24,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rubyboat.ghost.client.GhostClient;
 import rubyboat.ghost.config.Config;
-
-import java.util.Random;
 
 @Environment(EnvType.CLIENT)
 @Mixin(ClientWorld.class)

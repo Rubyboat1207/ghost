@@ -1,7 +1,7 @@
 {
   "category.ghost.general": "Ghost Keybinds",
   "ghost.general": "Ghost Options",
-  "key.ghost.createghostblock": "Create Ghost block",
+  "key.ghostforge.createghostblock": "Create Ghost block",
   "key.ghost.menu": "Open Menu",
   "title.ghost.config": "Ghost Config",
   "config_category.ghost.general": "General Options",
@@ -18,14 +18,13 @@
   "tooltip.ghost.snow": "Effects like Powder Snow, Lava, and Water",
   "entry.ghost.is_portal": "Nether Portal Texture on Camera",
   "entry.ghost.title": "Minecraft Menu Title",
-  "config_category.ghost.biome": "Biome Options",
+  "config_category.ghost.world": "World Options",
   "entry.ghost.color": "Sky Color",
   "tooltip.ghost.color": "Base value: 000000",
   "entry.ghost.fog": "Fog Color",
   "tooltip.ghost.fog": "Base value: 000000",
   "entry.ghost.snow": "Screen Texture:",
   "entry.ghost.cyrus_mode": "Remove Negative Y Coordinates",
-  "config_category.ghost.time" : "Time Settings",
   "tooltip.ghost.time": "Set to -1 to turn off custom time",
   "entry.ghost.time":"Time of Day",
   "entry.ghost.leaf": "Leave Color",
@@ -48,5 +47,11 @@
   "entry.ghost.player_model_offset":"Player Model Offset",
   "tooltip.ghost.technoblade": "Adds crowns to all pigs, RIP Techno",
   "entry.ghost.version": "Minecraft Version",
-  "entry.ghost.distance": "Zoom Out Camera Distance"
+  "entry.ghost.distance": "Zoom Out Camera Distance",
+  "config_category.ghost.gamemodes": "Gamemodes",
+  "label.ghost.world_presets": "Presets",
+  "entry.ghost.plains_color": "Grass Color Always Plains",
+  "entry.ghost.ocean_color": "Water Color Always Ocean",
+  "entry.ghost.jungle_color": "Grass Color Always Jungle",
+  "entry.ghost.sunset": "Time always sunset"
 }

@@ -7,15 +7,20 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.ColorFieldBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
+import rubyboat.clothconfigextensions.builders.ButtonBuilder;
+import rubyboat.clothconfigextensions.configEntryBuilderExtension;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class Config {
     /*
@@ -30,10 +35,10 @@ public class Config {
 
     static String block = "diamond_block";
     static String camera_type = "";
-    static int camera_distance = 10;
+    static int camera_distance = 4;
     static String path = "ghost_config.json";
     static boolean is_slippery = false;
-    static String player_texture = "none";
+    static String player_texture = "";
     static boolean is_sleeve = true;
     static int zoom_strength = 75;
     static boolean is_cyrus_mode = true;
@@ -44,7 +49,7 @@ public class Config {
     static Integer fog = 000000;
     static String title = "Minecraft";
     static Integer color = 0;
-    static Integer time = 0;
+    static Integer time = -1;
     static Integer leaf = 0;
     static Integer grass = 0;
     static boolean render_arms = true;
@@ -52,10 +57,6 @@ public class Config {
     static boolean render_body = true;
     static boolean render_head = true;
     static boolean technoblade = true;
-    static float arms_size = 1;
-    static float legs_size = 1;
-    static float body_size = 1;
-    static float head_size = 1;
     static float model_offset = 0;
     static String weather = "";
     static Integer water = 0;
@@ -63,18 +64,6 @@ public class Config {
     static String version = "";
     static int distance = 0;
     //getters for size changers
-    public static float getArms_size() {
-        return arms_size;
-    }
-    public static float getLegs_size() {
-        return legs_size;
-    }
-    public static float getBody_size() {
-        return body_size;
-    }
-    public static float getHead_size() {
-        return head_size;
-    }
 
 
     public static String[] blocks = {
@@ -219,30 +208,29 @@ public class Config {
         return config;
     }
 
+    public static void save() {
+        SerializedConfig config = new SerializedConfig();
+        MinecraftClient.getInstance().worldRenderer.reload();
+        MinecraftClient.getInstance().reloadResources();
+        try {
+            Files.writeString(Path.of(path), config.serialized());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Config.config = loadConfig();
+    }
+
     public static ConfigBuilder MakeConfig()
     {
-        SerializedConfig sc = getConfig();
-
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(MinecraftClient.getInstance().currentScreen)
                 .setTitle(Text.translatable("title.ghost.config"));
-        builder.setSavingRunnable(() -> {
-            SerializedConfig config = new SerializedConfig();
-            MinecraftClient.getInstance().worldRenderer.reload();
-            MinecraftClient.getInstance().reloadResources();
-            try {
-                Files.writeString(Path.of(path), config.serialized());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Config.config = loadConfig();
-        });
+        builder.setSavingRunnable(Config::save);
 
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("config_category.ghost.general"));
         ConfigCategory experimental = builder.getOrCreateCategory(Text.translatable("config_category.ghost.experimental"));
         ConfigCategory texture = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
-        ConfigCategory biome = builder.getOrCreateCategory(Text.translatable("config_category.ghost.biome"));
-        ConfigCategory time = builder.getOrCreateCategory(Text.translatable("config_category.ghost.time"));
+        ConfigCategory world = builder.getOrCreateCategory(Text.translatable("config_category.ghost.world"));
         ConfigCategory gamemodes = builder.getOrCreateCategory(Text.translatable("config_category.ghost.gamemodes"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         //---ENTRIES
@@ -256,12 +244,7 @@ public class Config {
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.camera_type = newValue
                 );
-
-        DropdownMenuBuilder<String> weather = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.weather"), Config.weather)
-                .setSelections(Arrays.asList(downfall))
-                .setSuggestionMode(false)
-                .setSaveConsumer(newValue -> Config.weather = newValue
-                );
+        general.addEntry(entryBuilder.startTextDescription(Text.of("test")).build());
         general.addEntry(blockmenu.build());
         gamemodes.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
@@ -303,15 +286,17 @@ public class Config {
         );*/
         texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
         general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
-        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.color"), Config.color)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.color"), Config.color)
                 .setSaveConsumer(newValue -> Config.color = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.color"))
                 .build());
+        world.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.world_presets")).build());
+
         experimental.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
-        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.fog"), Config.fog)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.fog"), Config.fog)
                 .setSaveConsumer(newValue -> Config.fog = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.fog"))
                 .build());
@@ -321,11 +306,11 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
                 );
 
-       biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.leaf"), Config.leaf)
+       world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.leaf"), Config.leaf)
                 .setSaveConsumer(newValue -> Config.leaf = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.leaf"))
                 .build());
-        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.grass"), Config.grass)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.grass"), Config.grass)
                 .setSaveConsumer(newValue -> Config.grass = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.grass"))
                 .build());
@@ -335,7 +320,7 @@ public class Config {
                 .build()
         );
         texture.addEntry(snow.build());
-        time.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), Config.time, -1 , 24000)
+        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), Config.time, -1 , 24000)
                 .setDefaultValue(0)
                 .setMin(-1)
                 .setMax(24000)
@@ -353,11 +338,11 @@ public class Config {
         texture.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.player_model_offset"), Config.model_offset)
                 .setSaveConsumer(newValue -> Config.model_offset = newValue)
                 .build());
-        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.water"), Config.water)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.water"), Config.water)
                 .setSaveConsumer(newValue -> Config.water = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.water"))
                 .build());
-        biome.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.waterfog"), Config.waterfog)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.waterfog"), Config.waterfog)
                 .setSaveConsumer(newValue -> Config.waterfog = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.waterfog"))
                 .build());
@@ -367,6 +352,49 @@ public class Config {
         general.addEntry(entryBuilder.startIntField(Text.translatable("entry.ghost.distance"), Config.distance)
                 .setSaveConsumer(newValue -> Config.distance = newValue)
                 .build());
+        world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.plains_color")).setOnPress(button -> {
+            Config.grass = 0x7aca60;
+            config.grass = 0x7aca60;
+            MinecraftClient.getInstance().setScreen(null);
+            save();
+        }).build());
+
+        world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.ocean_color")).setOnPress(button -> {
+            Config.water = 0x00ccaa;
+            config.water = 0x00ccaa;
+            Config.waterfog = 0x00ccaa;
+            config.waterfog = 0x00ccaa;
+            MinecraftClient.getInstance().setScreen(null);
+            save();
+        }).build());
+
+        world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.jungle_color")).setOnPress(button -> {
+            Config.grass = 0x40cf00;
+            config.grass = 0x40cf00;
+            Config.leaf = 0x40cf00;
+            config.leaf = 0x40cf00;
+            MinecraftClient.getInstance().setScreen(null);
+            save();
+        }).build());
+        //12700
+        world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.sunset")).setOnPress(button -> {
+            Config.time = 12700;
+            config.time = 12700;
+            MinecraftClient.getInstance().setScreen(null);
+            save();
+        }).build());
+        texture.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.moleman")).setOnPress(button -> {
+            Config.render_arms = false;
+            Config.render_legs = false;
+            Config.render_body = false;
+            Config.model_offset = -1.4f;
+            config.render_arms = false;
+            config.render_legs = false;
+            config.render_body = false;
+            config.model_offset = -1.4f;
+            MinecraftClient.getInstance().setScreen(null);
+            save();
+        }).build());
         //Build
         return builder;
     }
@@ -393,10 +421,6 @@ public class Config {
         public boolean render_body;
         public boolean render_head;
         public boolean technoblade;
-        float arms_size;
-        float legs_size;
-        float body_size;
-        float head_size;
         public boolean bouncy;
         public boolean antfarm;
         public float model_offset;
@@ -430,10 +454,6 @@ public class Config {
             this.render_legs = Config.render_legs;
             this.render_body = Config.render_body;
             this.render_head = Config.render_head;
-            this.arms_size = Config.arms_size;
-            this.legs_size = Config.legs_size;
-            this.body_size = Config.body_size;
-            this.head_size = Config.head_size;
             this.model_offset = Config.model_offset;
             this.water = Config.water;
             this.waterfog = Config.waterfog;

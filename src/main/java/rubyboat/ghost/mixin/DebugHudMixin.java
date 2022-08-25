@@ -5,15 +5,11 @@ import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import net.minecraft.SharedConstants;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderEffect;
+import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.network.ClientConnection;
@@ -21,23 +17,21 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.world.*;
 import net.minecraft.world.Heightmap.Type;
+import net.minecraft.world.LightType;
+import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.SpawnHelper;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.client.gui.hud.DebugHud;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,6 +40,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import rubyboat.ghost.client.GhostClient;
 import rubyboat.ghost.config.Config;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mixin(DebugHud.class)
 public abstract class DebugHudMixin {
