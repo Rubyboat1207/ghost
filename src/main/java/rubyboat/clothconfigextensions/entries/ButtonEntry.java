@@ -16,6 +16,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import rubyboat.clothconfigextensions.builders.ButtonBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,19 +38,18 @@ public class ButtonEntry extends TooltipListEntry<Object> {
     private final List<ButtonWidget> widgets;
     private ButtonWidget button;
     private List<OrderedText> wrappedLines;
-    @ApiStatus.Internal
-    @Deprecated
     public ButtonEntry(Text fieldName, Text text, ButtonWidget.PressAction onPress, int xbuffer) {
         this(fieldName, text, null, onPress, xbuffer);
     }
 
-    @ApiStatus.Internal
-    @Deprecated
     public ButtonEntry(Text fieldName, Text text, Supplier<Optional<Text[]>> tooltipSupplier, ButtonWidget.PressAction onPress, int xbuffer) {
         super(fieldName, tooltipSupplier);
         this.buttonInnerText = text;
         this.wrappedLines = Collections.emptyList();
-        this.button = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getWidth(text) + 6 + xbuffer, 20, text, onPress);
+        ButtonWidget.Builder builder = ButtonWidget.builder(text, onPress);
+        builder.size(MinecraftClient.getInstance().textRenderer.getWidth(text) + 6 + xbuffer, 20);
+        builder.position(0, 0);
+        this.button = builder.build();
         widgets = Lists.newArrayList(button);
     }
 
@@ -62,8 +62,12 @@ public class ButtonEntry extends TooltipListEntry<Object> {
             this.savedX = x;
             this.savedY = y;
         }
-        button.x = getConfigScreen().width / 2 - button.getWidth() / 2;
-        button.y = y;
+        if(getConfigScreen() == null) {
+            return;
+        }
+
+        button.setX(getConfigScreen().width / 2 - button.getWidth() / 2);
+        button.setY(y);
         button.render(matrices, mouseX, mouseY, delta);
 
 

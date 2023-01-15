@@ -4,6 +4,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,6 +23,8 @@ import rubyboat.ghost.config.Config;
 public abstract class MinecraftClientMixin {
 
     @Shadow @Nullable public ClientPlayerEntity player;
+
+    @Shadow @Nullable public ClientPlayerInteractionManager interactionManager;
 
     @Inject(at = @At("HEAD"), method = "tick")
     public void tick(CallbackInfo ci){
@@ -45,4 +51,18 @@ public abstract class MinecraftClientMixin {
             cir.setReturnValue(Config.getVersion());
         }
     }
+
+    @Inject(at = @At("HEAD"), method = "handleBlockBreaking", cancellable = true)
+    public void cancelBlockBreaking(boolean breaking, CallbackInfo ci) {
+        if (Config.getDurability() && breaking) {
+            ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+            int remaining = stack.getMaxDamage() - stack.getDamage();
+            double percent = (double) remaining / (double) stack.getMaxDamage();
+            if(percent <= Config.getDurabilityPercentage()) {
+                this.interactionManager.cancelBlockBreaking();
+                ci.cancel();
+            }
+        }
+    }
+
 }

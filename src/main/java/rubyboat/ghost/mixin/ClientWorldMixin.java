@@ -1,5 +1,6 @@
 package rubyboat.ghost.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -7,9 +8,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,25 +39,8 @@ public abstract class ClientWorldMixin {
             if(client.player.isCreative() || (client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-1,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-2,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-3,0)).getBlock() != Blocks.AIR))
             {
                 BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
-                this.setBlockState(suggestedBlockpos, Registry.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState(), 0, 0);
+                this.setBlockState(suggestedBlockpos, Registries.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState(), 0, 0);
             }
-        }
-        if(Config.isAntfarm())
-        {
-            BlockPos pos = this.client.player.getBlockPos().add(10,0,0);
-            for(BlockPos blockpos : BlockPos.iterate(pos.add(-10,0,5), pos.add(0,0,-2)))
-            {
-                if(((ClientWorld)(Object)this).getBlockState(blockpos).getBlock() != Blocks.AIR)
-                {
-                    for(BlockPos block : BlockPos.iterate(pos.add(-9,-10,-20), pos.add(10,10,20)))
-                    {
-                        setBlockState(block, Blocks.AIR.getDefaultState(), 0, 0);
-                    }
-                    break;
-                }
-            }
-
-
         }
     }
 

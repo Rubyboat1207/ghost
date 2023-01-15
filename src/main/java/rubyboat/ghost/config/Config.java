@@ -23,13 +23,19 @@ import java.util.Arrays;
 import java.util.UUID;
 
 public class Config {
-    /*
-    Challenge Ideas:
-    Minecraft but only chunks I have been on render
-    Minecraft but only one block renders at a time
+    //I AM SO SORRY FOR ANYONE WHO HAS TO READ THIS CODE
+    //to add to config, you must add it in 3 places:
+    //1. add it to the config class
+    //2. add it to the serialized config class
+    //3. add it to the loadConfig method
 
-    Notes:
-    BlockRenderManager Exists
+    /*
+        Challenge Ideas:
+        Minecraft but only chunks I have been on render
+        Minecraft but only one block renders at a time
+
+        Notes:
+        BlockRenderManager Exists
      */
 
 
@@ -62,7 +68,9 @@ public class Config {
     static Integer water = 0;
     static Integer waterfog = 0;
     static String version = "";
-    static int distance = 0;
+    static int distance = 4;
+    static boolean durability = false;
+    static double durability_percentage = 10;
     //getters for size changers
 
 
@@ -134,7 +142,7 @@ public class Config {
     }
     public static boolean isSleeve(){return getConfig().is_sleeve;}
     public static boolean isPortal(){return getConfig().in_portal;}
-    public static boolean isCyrusMode(){return getConfig().is_cyrus_mode;}
+    public static boolean disableNegatives(){return getConfig().is_cyrus_mode;}
     public static boolean isRender_arms(){return getConfig().render_arms;}
     public static boolean isRender_legs(){return getConfig().render_legs;}
     public static boolean isRender_body(){return getConfig().render_body;}
@@ -151,6 +159,8 @@ public class Config {
     public static Integer waterfog(){return getConfig().waterfog;}
     public static String getVersion(){return getConfig().version;}
     public static Integer getDistance(){return getConfig().distance;}
+    public static boolean getDurability(){return getConfig().durability;}
+    public static double getDurabilityPercentage(){return getConfig().durability_percentage / 100;}
 
     public static SerializedConfig config = null;
     public static SerializedConfig loadConfig()
@@ -194,6 +204,8 @@ public class Config {
         Config.bouncy = to_return.bouncy;
         Config.distance = to_return.distance;
         Config.technoblade = to_return.technoblade;
+        Config.durability = to_return.durability;
+        Config.durability_percentage = to_return.durability_percentage;
         return to_return;
     }
 
@@ -209,15 +221,26 @@ public class Config {
     }
 
     public static void save() {
+        save(true);
+    }
+    public static void save(boolean reload) {
         SerializedConfig config = new SerializedConfig();
-        MinecraftClient.getInstance().worldRenderer.reload();
-        MinecraftClient.getInstance().reloadResources();
+        if(reload) {
+            MinecraftClient.getInstance().worldRenderer.reload();
+            MinecraftClient.getInstance().reloadResources();
+        }
         try {
             Files.writeString(Path.of(path), config.serialized());
         } catch (IOException e) {
             e.printStackTrace();
         }
         Config.config = loadConfig();
+    }
+
+    public static void refresh() {
+        save();
+        MinecraftClient.getInstance().setScreen(null);
+        MinecraftClient.getInstance().setScreen(Config.MakeConfig().build());
     }
 
     public static ConfigBuilder MakeConfig()
@@ -244,7 +267,6 @@ public class Config {
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> Config.camera_type = newValue
                 );
-        general.addEntry(entryBuilder.startTextDescription(Text.of("test")).build());
         general.addEntry(blockmenu.build());
         gamemodes.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
@@ -275,9 +297,9 @@ public class Config {
                 .build()
         );
         texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.technoblade"), Config.technoblade)
-                .setSaveConsumer(newValue -> Config.technoblade = newValue)
-                .setTooltip(Text.translatable("tooltip.ghost.technoblade"))
-                .build()
+            .setSaveConsumer(newValue -> Config.technoblade = newValue)
+            .setTooltip(Text.translatable("tooltip.ghost.technoblade"))
+            .build()
         );
 
         /*gamemodes.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.AntFarm"), Config.antfarm)
@@ -352,6 +374,17 @@ public class Config {
         general.addEntry(entryBuilder.startIntField(Text.translatable("entry.ghost.distance"), Config.distance)
                 .setSaveConsumer(newValue -> Config.distance = newValue)
                 .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.durability"), Config.durability)
+                .setSaveConsumer((newValue) -> Config.durability = newValue)
+                .build());
+        if(Config.durability) {
+            general.addEntry(entryBuilder.startDoubleField(Text.translatable("entry.ghost.durability_percentage"), Config.durability_percentage)
+                .setSaveConsumer(newValue -> Config.durability_percentage = newValue)
+                .setMin(0)
+                .setMax(100)
+                .build());
+        }
+
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.plains_color")).setOnPress(button -> {
             Config.grass = 0x7aca60;
             config.grass = 0x7aca60;
@@ -430,6 +463,8 @@ public class Config {
         public int distance;
 
         public int zoom_strength;
+        public boolean durability;
+        public double durability_percentage;
 
         public SerializedConfig()
         {
@@ -462,6 +497,8 @@ public class Config {
             this.bouncy = Config.bouncy;
             this.antfarm = Config.antfarm;
             this.technoblade = Config.technoblade;
+            this.durability = Config.durability;
+            this.durability_percentage = Config.durability_percentage;
         }
         public String serialized(){
             return new Gson().toJson(this);

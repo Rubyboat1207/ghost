@@ -7,14 +7,15 @@
     "BiomeMixin",
     "BlockMixin",
     "CameraMixin",
-    "ClientPlayerEntityMixin",
     "ClientWorldMixin",
+    "ClientWorldPropertiesMixin",
+    "DeathScreenMixin",
     "DebugHudMixin",
-    "gameRendererMixin",
+    "DirectConnectScreenMixin",
+    "InteractionManagerMixin",
     "MinecraftClientMixin",
     "PigEntityModelMixin",
-    "PlayerRenderMixin",
-    "ClientWorldPropertiesMixin"
+    "PlayerRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

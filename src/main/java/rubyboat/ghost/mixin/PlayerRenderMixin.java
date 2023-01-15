@@ -27,8 +27,6 @@ public abstract class PlayerRenderMixin {
     public void getTexture(AbstractClientPlayerEntity abstractClientPlayerEntity, CallbackInfoReturnable<Identifier> cir) {
         if(!Config.getPlayerTexture().equals("")){
             cir.setReturnValue(new Identifier("textures/" + Config.getPlayerTexture() + ".png"));
-
-            //abstractClientPlayerEntity.getSkinTexture()
         }
     }
 
