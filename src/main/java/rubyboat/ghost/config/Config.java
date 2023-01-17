@@ -53,7 +53,7 @@ public class Config {
     static boolean antfarm = false;
     static String inPowderSnowEffect = "none";
     static Integer fog = 000000;
-    static String title = "Minecraft";
+    static String title = "";
     static Integer color = 0;
     static Integer time = -1;
     static Integer leaf = 0;

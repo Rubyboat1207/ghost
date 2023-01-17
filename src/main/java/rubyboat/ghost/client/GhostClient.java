@@ -4,7 +4,10 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -17,17 +20,20 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import rubyboat.ghost.server.NetworkHandler;
 
 @Environment(EnvType.CLIENT)
 public class GhostClient implements ClientModInitializer {
 
     public static KeyBinding keyBinding;
     public static KeyBinding keyBinding2;
-    public static KeyBinding zoom;
     private static final Logger LOGGER = LogManager.getLogger();
     public static float roundTo(float number, int decimalPoints) {
         return (float) (Math.floor(number * Math.pow(10, decimalPoints)) * Math.pow(10, -decimalPoints));
     }
+
+    public static boolean AllowMidAirGhostBlocks = false;
+
     @Override
     public void onInitializeClient() {
         LOGGER.log(Level.INFO, AbstractBlock.class.getName());
@@ -43,5 +49,9 @@ public class GhostClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_RIGHT_SHIFT, // The keycode of the key
                 "category.ghost.general" // The translation key of the keybinding's category.
         ));
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            AllowMidAirGhostBlocks = false;
+        });
+        NetworkHandler.registerS2CPackets();
     }
 }

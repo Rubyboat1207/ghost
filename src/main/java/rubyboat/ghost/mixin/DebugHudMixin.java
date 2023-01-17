@@ -57,4 +57,8 @@ public abstract class DebugHudMixin {
         }
         return args;
     }
+
+    int getAddition() {
+        return Math.abs(MinecraftClient.getInstance().player.getWorld().getDimension().minY()) ;
+    }
 }
