@@ -52,7 +52,7 @@ public class Config {
     static boolean bouncy = false;
     static boolean antfarm = false;
     static String inPowderSnowEffect = "none";
-    static Integer fog = 000000;
+    static Integer fog = 0;
     static String title = "";
     static Integer color = 0;
     static Integer time = -1;
@@ -251,7 +251,7 @@ public class Config {
         builder.setSavingRunnable(Config::save);
 
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("config_category.ghost.general"));
-        ConfigCategory experimental = builder.getOrCreateCategory(Text.translatable("config_category.ghost.experimental"));
+        //ConfigCategory experimental = builder.getOrCreateCategory(Text.translatable("config_category.ghost.experimental"));
         ConfigCategory texture = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
         ConfigCategory world = builder.getOrCreateCategory(Text.translatable("config_category.ghost.world"));
         ConfigCategory gamemodes = builder.getOrCreateCategory(Text.translatable("config_category.ghost.gamemodes"));
@@ -271,7 +271,7 @@ public class Config {
         gamemodes.addEntry(cameramenu.build());
         if(camera_type.equalsIgnoreCase("topdown"))
         {
-            experimental.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.camera_distance"), Config.camera_distance, 3, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
+            gamemodes.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.camera_distance"), Config.camera_distance, 3, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
         }
         general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
         texture.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.player_texture"), Config.player_texture)
@@ -279,6 +279,8 @@ public class Config {
                 .setTooltip(Text.translatable("tooltip.ghost.player_texture"))
                 .build()
         );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
+        texture.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.model_visibility")).build());
         //Update Model Visibility
         texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_arms"), Config.render_arms)
                 .setSaveConsumer(newValue -> Config.render_arms = newValue)
@@ -306,15 +308,13 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.antfarm = newValue)
                 .build()
         );*/
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
         general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
         world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.color"), Config.color)
                 .setSaveConsumer(newValue -> Config.color = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.color"))
                 .build());
-        world.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.world_presets")).build());
 
-        experimental.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
                 .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
@@ -342,21 +342,7 @@ public class Config {
                 .build()
         );
         texture.addEntry(snow.build());
-        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), Config.time, -1 , 24000)
-                .setDefaultValue(0)
-                .setMin(-1)
-                .setMax(24000)
-                .setTooltip(Text.translatable("tooltip.ghost.time"))
-                .setSaveConsumer(newValue -> Config.time = newValue)
-                .build()
-        );
-        general.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.zoom_strength"), Config.zoom_strength, 50 , 95)
-                .setDefaultValue(0)
-                .setMin(50)
-                .setMax(95)
-                .setSaveConsumer(newValue -> Config.zoom_strength = newValue)
-                .build()
-        );
+
         texture.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.player_model_offset"), Config.model_offset)
                 .setSaveConsumer(newValue -> Config.model_offset = newValue)
                 .build());
@@ -368,6 +354,14 @@ public class Config {
                 .setSaveConsumer(newValue -> Config.waterfog = newValue)
                 .setTooltip(Text.translatable("tooltip.ghost.waterfog"))
                 .build());
+        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), Config.time, -1 , 24000)
+                .setDefaultValue(0)
+                .setMin(-1)
+                .setMax(24000)
+                .setTooltip(Text.translatable("tooltip.ghost.time"))
+                .setSaveConsumer(newValue -> Config.time = newValue)
+                .build()
+        );
         general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.version"), Config.version)
                 .setSaveConsumer(newValue -> Config.version = newValue)
                 .build());
@@ -384,7 +378,7 @@ public class Config {
                 .setMax(100)
                 .build());
         }
-
+        world.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.world_presets")).build());
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.plains_color")).setOnPress(button -> {
             Config.grass = 0x7aca60;
             config.grass = 0x7aca60;
@@ -420,10 +414,12 @@ public class Config {
             Config.render_arms = false;
             Config.render_legs = false;
             Config.render_body = false;
+            Config.render_head = true;
             Config.model_offset = -1.4f;
             config.render_arms = false;
             config.render_legs = false;
             config.render_body = false;
+            config.render_head = true;
             config.model_offset = -1.4f;
             MinecraftClient.getInstance().setScreen(null);
             save();
