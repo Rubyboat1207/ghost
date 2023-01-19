@@ -1,6 +1,5 @@
 package rubyboat.ghost.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -39,7 +38,7 @@ public abstract class ClientWorldMixin {
             if(client.player.isCreative() || (client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-1,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-2,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-3,0)).getBlock() != Blocks.AIR))
             {
                 BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
-                this.setBlockState(suggestedBlockpos, Registries.BLOCK.get(new Identifier("minecraft", Config.getBlock())).getDefaultState(), 0, 0);
+                this.setBlockState(suggestedBlockpos, Registries.BLOCK.get(new Identifier("minecraft", Config.getConfigValueString("block"))).getDefaultState(), 0, 0);
             }
         }
     }

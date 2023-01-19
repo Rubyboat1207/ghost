@@ -1,19 +1,13 @@
 package rubyboat.ghost.config;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.impl.builders.ColorFieldBuilder;
-import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
-import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
 import rubyboat.clothconfigextensions.builders.ButtonBuilder;
-import rubyboat.clothconfigextensions.configEntryBuilderExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,75 +17,9 @@ import java.util.Arrays;
 import java.util.UUID;
 
 public class Config {
-    //I AM SO SORRY FOR ANYONE WHO HAS TO READ THIS CODE
-    //to add to config, you must add it in 3 places:
-    //1. add it to the config class
-    //2. add it to the serialized config class
-    //3. add it to the loadConfig method
-
-    /*
-        Challenge Ideas:
-        Minecraft but only chunks I have been on render
-        Minecraft but only one block renders at a time
-
-        Notes:
-        BlockRenderManager Exists
-     */
-
-
-    static String block = "diamond_block";
-    static String camera_type = "";
-    static int camera_distance = 4;
+    static JsonObject config;
     static String path = "ghost_config.json";
-    static boolean is_slippery = false;
-    static String player_texture = "";
-    static boolean is_sleeve = true;
-    static int zoom_strength = 75;
-    static boolean is_cyrus_mode = true;
-    static boolean inNetherPortalEffect = false;
-    static boolean bouncy = false;
-    static boolean antfarm = false;
-    static String inPowderSnowEffect = "none";
-    static Integer fog = 0;
-    static String title = "";
-    static Integer color = 0;
-    static Integer time = -1;
-    static Integer leaf = 0;
-    static Integer grass = 0;
-    static boolean render_arms = true;
-    static boolean render_legs = true;
-    static boolean render_body = true;
-    static boolean render_head = true;
-    static boolean technoblade = true;
-    static float model_offset = 0;
-    static String weather = "";
-    static Integer water = 0;
-    static Integer waterfog = 0;
-    static String version = "";
-    static int distance = 4;
-    static boolean durability = false;
-    static double durability_percentage = 10;
-    //getters for size changers
 
-
-    public static String[] blocks = {
-            "diamond_block",
-            "bedrock",
-            "dirt",
-            "pink_wool",
-            "polished_andesite"
-    };
-    public static String[] camera_modes = {
-            "normal",
-            "topdown",
-            "choppy"
-    };
-    public static String[] effects = {
-            "none",
-            "snow",
-            "water",
-            "lava"
-    };
     public static String[] downfall = {
             "none",
             "rain",
@@ -100,71 +28,97 @@ public class Config {
             "test"
     };
 
-    public static String getBlock()
-    {
-        return Arrays.asList(blocks).contains(getConfig().block) ? getConfig().block : "poppy";
-    }
-    public static String getCamera_type()
-    {
-        return Arrays.asList(camera_modes).contains(getConfig().camera_type) ? getConfig().camera_type : "normal";
-    }
-    public static String getWeather(){
-        return Arrays.asList(downfall).contains(getConfig().weather) ? getConfig().weather : "none";
+    public static int getConfigValueInt(String path) {
+
+        try {
+            return getConfig().get(path).getAsInt();
+        }catch (Exception e){
+            //System.out.println("Failed to get config value for " + path);
+            return 0;
+        }
     }
 
-    public static boolean isSlippery()
-    {
-        return getConfig().is_slippery;
+    public static double getConfigValueDouble(String path) {
+        return getConfig().get(path).getAsDouble();
     }
-    public static String getInPowderSnowEffect() {
-        return Arrays.asList(effects).contains(getConfig().in_snow) ? getConfig().in_snow : "none";
-    }
-    public static String getPlayerTexture(){return getConfig().player_texture;}
-    public static int getCameraDistance()
-    {
-        return getConfig().camera_distance;
-    }
-    public static String getTitle()
-    {
-        return getConfig().title;
-    }
-    public static int getZoomStrength()
-    {
-        return getConfig().zoom_strength;
-    }
-    public static boolean getBouncy()
-    {
-        return getConfig().bouncy;
-    }
-    public static boolean isTechnoblade()
-    {
-        return getConfig().technoblade;
-    }
-    public static boolean isSleeve(){return getConfig().is_sleeve;}
-    public static boolean isPortal(){return getConfig().in_portal;}
-    public static boolean disableNegatives(){return getConfig().is_cyrus_mode;}
-    public static boolean isRender_arms(){return getConfig().render_arms;}
-    public static boolean isRender_legs(){return getConfig().render_legs;}
-    public static boolean isRender_body(){return getConfig().render_body;}
-    public static boolean isRender_head(){return getConfig().render_head;}
-    public static boolean isAntfarm(){return false;}
-    public static float getModelOffset(){return getConfig().model_offset;}
-    public static String title(){return getConfig().title;}
-    public static Integer color(){return getConfig().biomecolor;}
-    public static Integer fog(){return getConfig().fog;}
-    public static Integer time(){return getConfig().time;}
-    public static Integer leaf(){return getConfig().leaf;}
-    public static Integer grass(){return getConfig().grass;}
-    public static Integer water(){return getConfig().water;}
-    public static Integer waterfog(){return getConfig().waterfog;}
-    public static String getVersion(){return getConfig().version;}
-    public static Integer getDistance(){return getConfig().distance;}
-    public static boolean getDurability(){return getConfig().durability;}
-    public static double getDurabilityPercentage(){return getConfig().durability_percentage / 100;}
 
-    public static SerializedConfig config = null;
-    public static SerializedConfig loadConfig()
-    {
+    public static float getConfigValueFloat(String path) {
+        if (getConfig().get(path) == null) {
+            return 0;
+        }
+        return getConfig().get(path).getAsFloat();
+    }
+
+    public static boolean getConfigValueBoolean(String path) {
+        if(getConfig().get(path) == null) {
+            return false;
+        }
+        return getConfig().get(path).getAsBoolean();
+    }
+
+    public static String getConfigValueString(String path) {
+        if(getConfig().get(path) == null) {
+            return "";
+        }
+        return getConfig().get(path).getAsString();
+    }
+
+    static void setConfigValue(String path, int value) {
+        getConfig().addProperty(path, value);
+    }
+
+    static void setConfigValue(String path, double value) {
+        getConfig().addProperty(path, value);
+    }
+
+    static void setConfigValue(String path, boolean value) {
+        getConfig().addProperty(path, value);
+    }
+
+    static void setConfigValue(String path, String value) {
+        getConfig().addProperty(path, value);
+    }
+
+    static JsonObject getFallbackConfig() {
+        JsonObject fallback = new JsonObject();
+
+        // -- General --
+        fallback.addProperty("block", "diamond_block");
+        fallback.addProperty("frozen", false);
+        fallback.addProperty("bouncy", false);
+        fallback.addProperty("disable_negatives", false);
+        fallback.addProperty("title", "");
+        fallback.addProperty("camera_distance", 4);
+        fallback.addProperty("version", "");
+        fallback.addProperty("version", "");
+        fallback.addProperty("durability", false);
+        fallback.addProperty("durability_percentage", 10);
+
+        // -- Visuals --
+        fallback.addProperty("player_texture", "");
+        fallback.addProperty("sleeve_visibility", true);
+        fallback.addProperty("hud_effect", "none");
+        fallback.addProperty("fog_color", 0);
+        fallback.addProperty("grass_color", 0);
+        fallback.addProperty("foliage_color", 0);
+        fallback.addProperty("sky_color", 0);
+        fallback.addProperty("water_color", 0);
+        fallback.addProperty("water_fog_color", 0);
+        fallback.addProperty("time", 0);
+        fallback.addProperty("render_head", true);
+        fallback.addProperty("render_arms", true);
+        fallback.addProperty("render_body", true);
+        fallback.addProperty("render_legs", true);
+        fallback.addProperty("model_offset", 0);
+        fallback.addProperty("technoblade", true);
+
+        // -- Gamemodes --
+        fallback.addProperty("camera_type", "none");
+
+        return fallback;
+    }
+
+    static void loadConfig() {
         File file = new File(path);
         String fromfile = "";
         try{
@@ -172,50 +126,20 @@ public class Config {
         }catch (Exception e)
         {
             try{
-                Files.writeString(Path.of(path), new SerializedConfig().serialized());
+                Files.writeString(Path.of(path), getFallbackConfig().toString());
                 fromfile = Files.readString(Path.of(path));
-            }catch (Exception ignored) { }
-            e.printStackTrace();
+            }catch (Exception ignored) {
+                config = getFallbackConfig();
+                System.out.println(config);
+                return;
+            }
         }
-        SerializedConfig to_return = new Gson().fromJson(fromfile, SerializedConfig.class);
-
-        Config.is_sleeve = to_return.is_sleeve;
-        Config.block = to_return.block;
-        Config.is_slippery = to_return.is_slippery;
-        Config.camera_type = to_return.camera_type;
-        Config.player_texture = to_return.player_texture;
-        Config.inNetherPortalEffect = to_return.in_portal;
-        Config.inPowderSnowEffect = to_return.in_snow;
-        Config.title = to_return.title;
-        Config.color = to_return.biomecolor;
-        Config.is_cyrus_mode = to_return.is_cyrus_mode;
-        Config.time = to_return.time;
-        Config.leaf = to_return.leaf;
-        Config.grass = to_return.grass;
-        Config.weather = to_return.weather;
-        Config.zoom_strength = to_return.zoom_strength;
-        Config.render_arms = to_return.render_arms;
-        Config.render_legs = to_return.render_legs;
-        Config.render_body = to_return.render_body;
-        Config.render_head = to_return.render_head;
-        Config.model_offset = to_return.model_offset;
-        Config.water = to_return.water;
-        Config.waterfog = to_return.waterfog;
-        Config.bouncy = to_return.bouncy;
-        Config.distance = to_return.distance;
-        Config.technoblade = to_return.technoblade;
-        Config.durability = to_return.durability;
-        Config.durability_percentage = to_return.durability_percentage;
-        return to_return;
+        config = new Gson().fromJson(fromfile, JsonObject.class);
     }
 
-
-    public static SerializedConfig getConfig()
-    {
-        if(config == null)
-        {
-            config =loadConfig();
-            return config;
+    static JsonObject getConfig() {
+        if(config == null) {
+            loadConfig();
         }
         return config;
     }
@@ -224,280 +148,234 @@ public class Config {
         save(true);
     }
     public static void save(boolean reload) {
-        SerializedConfig config = new SerializedConfig();
         if(reload) {
             MinecraftClient.getInstance().worldRenderer.reload();
             MinecraftClient.getInstance().reloadResources();
         }
+
         try {
-            Files.writeString(Path.of(path), config.serialized());
+            Files.writeString(Path.of(path), config.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Config.config = loadConfig();
+        loadConfig();
     }
 
-    public static void refresh() {
-        save();
-        MinecraftClient.getInstance().setScreen(null);
-        MinecraftClient.getInstance().setScreen(Config.MakeConfig().build());
-    }
-
-    public static ConfigBuilder MakeConfig()
-    {
-        ConfigBuilder builder = ConfigBuilder.create()
-                .setParentScreen(MinecraftClient.getInstance().currentScreen)
-                .setTitle(Text.translatable("title.ghost.config"));
-        builder.setSavingRunnable(Config::save);
-
+    static void GenerateGeneral(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("config_category.ghost.general"));
-        //ConfigCategory experimental = builder.getOrCreateCategory(Text.translatable("config_category.ghost.experimental"));
-        ConfigCategory texture = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
-        ConfigCategory world = builder.getOrCreateCategory(Text.translatable("config_category.ghost.world"));
-        ConfigCategory gamemodes = builder.getOrCreateCategory(Text.translatable("config_category.ghost.gamemodes"));
-        ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        //---ENTRIES
-        DropdownMenuBuilder<String> blockmenu = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.ghost_block"), Config.block)
-                .setSelections(Arrays.asList(blocks))
-                .setSuggestionMode(false)
-                .setSaveConsumer(newValue -> Config.block = newValue
-                );
-        DropdownMenuBuilder<String> cameramenu = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.camera_type"), Config.camera_type)
-                .setSelections(Arrays.asList(camera_modes))
-                .setSuggestionMode(false)
-                .setSaveConsumer(newValue -> Config.camera_type = newValue
-                );
-        general.addEntry(blockmenu.build());
-        gamemodes.addEntry(cameramenu.build());
-        if(camera_type.equalsIgnoreCase("topdown"))
-        {
-            gamemodes.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.camera_distance"), Config.camera_distance, 3, 100).setSaveConsumer(newValue -> Config.camera_distance = newValue).build());
+
+        final String[] blocks = {
+            "diamond_block",
+            "bedrock",
+            "dirt",
+            "pink_wool",
+            "polished_andesite"
+        };
+
+        general.addEntry(entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.ghost_block"), getConfigValueString("block"))
+            .setSelections(Arrays.asList(blocks))
+            .setSuggestionMode(false)
+            .setSaveConsumer(newValue -> setConfigValue("block", newValue))
+            .build()
+        );
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_slippery"), getConfigValueBoolean("frozen"))
+                .setSaveConsumer(newValue -> setConfigValue("frozen", newValue))
+                .build()
+        );
+        general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.title"), getConfigValueString("title"))
+                .setSaveConsumer(newValue -> setConfigValue("title", newValue))
+                .build()
+        );
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.cyrus_mode"), getConfigValueBoolean("disable_negatives"))
+            .setSaveConsumer(newValue -> setConfigValue("disable_negatives", newValue))
+            .build()
+        );
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.bouncy"), getConfigValueBoolean("bouncy"))
+            .setSaveConsumer(newValue -> setConfigValue("bouncy", newValue))
+            .build()
+        );
+        general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.version"), getConfigValueString("version"))
+            .setSaveConsumer(newValue -> setConfigValue("version", newValue))
+            .build()
+        );
+        general.addEntry(entryBuilder.startIntField(Text.translatable("entry.ghost.distance"), getConfigValueInt("camera_distance"))
+            .setSaveConsumer(newValue -> setConfigValue("camera_distance", newValue))
+            .build()
+        );
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.durability"), getConfigValueBoolean("durability"))
+            .setSaveConsumer((newValue) -> setConfigValue("durability", newValue))
+            .build()
+        );
+        if(getConfigValueBoolean("durability")) {
+            general.addEntry(entryBuilder.startDoubleField(Text.translatable("entry.ghost.durability_percentage"), getConfigValueDouble("durability_percentage"))
+                .setSaveConsumer(newValue -> setConfigValue("durability_percentage", newValue))
+                .setMin(0)
+                .setMax(100)
+                .build()
+            );
         }
-        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_slippery"), Config.is_slippery).setSaveConsumer(newValue -> Config.is_slippery = newValue).build());
-        texture.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.player_texture"), Config.player_texture)
-                .setSaveConsumer(newValue -> Config.player_texture = newValue)
-                .setTooltip(Text.translatable("tooltip.ghost.player_texture"))
+    }
+
+    static void GenerateVisuals(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
+        ConfigCategory texture = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
+
+        final String[] effects = {
+                "none",
+                "snow",
+                "water",
+                "lava"
+        };
+
+        texture.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.player_texture"), getConfigValueString("player_texture"))
+            .setSaveConsumer(newValue -> setConfigValue("player_texture", newValue))
+            .setTooltip(Text.translatable("tooltip.ghost.player_texture"))
+            .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), getConfigValueBoolean("sleeve_visibility"))
+                .setSaveConsumer(newValue -> setConfigValue("sleeve_visibility", newValue))
                 .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), Config.is_sleeve).setSaveConsumer(newValue -> Config.is_sleeve = newValue).build());
-        texture.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.model_visibility")).build());
-        //Update Model Visibility
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_arms"), Config.render_arms)
-                .setSaveConsumer(newValue -> Config.render_arms = newValue)
+        // -- Hud Visual Effects
+        texture.addEntry(entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.snow"), getConfigValueString("hud_effect"))
+                .setSelections(Arrays.asList(effects))
+                .setSuggestionMode(false)
+                .setSaveConsumer(newValue -> setConfigValue("hud_effect", newValue))
                 .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_legs"), Config.render_legs)
-                .setSaveConsumer(newValue -> Config.render_legs = newValue)
-                .build()
+        // -- Update Model Visibility
+        texture.addEntry(entryBuilder.startTextDescription(
+            Text.translatable("label.ghost.model_visibility")).
+            build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_body"), Config.render_body)
-                .setSaveConsumer(newValue -> Config.render_body = newValue)
-                .build()
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_arms"), getConfigValueBoolean("render_arms"))
+            .setSaveConsumer(newValue -> setConfigValue("render_arms", newValue))
+            .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_head"), Config.render_head)
-                .setSaveConsumer(newValue -> Config.render_head = newValue)
-                .build()
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_legs"), getConfigValueBoolean("render_legs"))
+            .setSaveConsumer(newValue -> setConfigValue("render_legs", newValue))
+            .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.technoblade"), Config.technoblade)
-            .setSaveConsumer(newValue -> Config.technoblade = newValue)
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_body"), getConfigValueBoolean("render_body"))
+            .setSaveConsumer(newValue -> setConfigValue("render_body", newValue))
+            .build()
+        );
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_head"), getConfigValueBoolean("render_head"))
+            .setSaveConsumer(newValue -> setConfigValue("render_head", newValue))
+            .build()
+        );
+        texture.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.model_offset"), getConfigValueFloat("model_offset"))
+            .setSaveConsumer(newValue -> setConfigValue("model_offset", newValue))
+            .build()
+        );
+        // -- Other Entities
+        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.technoblade"), getConfigValueBoolean("technoblade"))
+            .setSaveConsumer(newValue -> setConfigValue("technoblade", newValue))
             .setTooltip(Text.translatable("tooltip.ghost.technoblade"))
             .build()
         );
 
-        /*gamemodes.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.AntFarm"), Config.antfarm)
-                .setSaveConsumer(newValue -> Config.antfarm = newValue)
-                .build()
-        );*/
-        general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.title"), Config.title).setSaveConsumer(newValue -> Config.title = newValue).build());
-        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.color"), Config.color)
-                .setSaveConsumer(newValue -> Config.color = newValue)
+    }
+
+    static void GenerateWorld(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
+        ConfigCategory world = builder.getOrCreateCategory(Text.translatable("config_category.ghost.world"));
+
+
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.color"), getConfigValueInt("sky_color"))
+                .setSaveConsumer(newValue -> setConfigValue("sky_color", newValue))
                 .setTooltip(Text.translatable("tooltip.ghost.color"))
-                .build());
-
-        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.cyrus_mode"), Config.is_cyrus_mode)
-                .setSaveConsumer(newValue -> Config.is_cyrus_mode = newValue)
                 .build()
         );
-        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.fog"), Config.fog)
-                .setSaveConsumer(newValue -> Config.fog = newValue)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.fog"), getConfigValueInt("fog_color"))
+                .setSaveConsumer(newValue -> setConfigValue("fog_color", newValue))
                 .setTooltip(Text.translatable("tooltip.ghost.fog"))
-                .build());
-        DropdownMenuBuilder<String> snow = entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.snow"), Config.inPowderSnowEffect)
-                .setSelections(Arrays.asList(effects))
-                .setSuggestionMode(false)
-                .setSaveConsumer(newValue -> Config.inPowderSnowEffect = newValue
-                );
-
-       world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.leaf"), Config.leaf)
-                .setSaveConsumer(newValue -> Config.leaf = newValue)
-                .setTooltip(Text.translatable("tooltip.ghost.leaf"))
-                .build());
-        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.grass"), Config.grass)
-                .setSaveConsumer(newValue -> Config.grass = newValue)
-                .setTooltip(Text.translatable("tooltip.ghost.grass"))
-                .build());
-
-        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.bouncy"), Config.bouncy)
-                .setSaveConsumer(newValue -> Config.bouncy = newValue)
                 .build()
         );
-        texture.addEntry(snow.build());
-
-        texture.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.player_model_offset"), Config.model_offset)
-                .setSaveConsumer(newValue -> Config.model_offset = newValue)
-                .build());
-        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.water"), Config.water)
-                .setSaveConsumer(newValue -> Config.water = newValue)
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.leaf"),getConfigValueInt("foliage_color"))
+                .setSaveConsumer(newValue -> setConfigValue("foliage_color", newValue))
+                .setTooltip(Text.translatable("tooltip.ghost.leaf"))
+                .build()
+        );
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.grass"), getConfigValueInt("grass_color"))
+                .setSaveConsumer(newValue -> setConfigValue("grass_color", newValue))
+                .setTooltip(Text.translatable("tooltip.ghost.grass"))
+                .build()
+        );
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.water"), getConfigValueInt("water_color"))
+                .setSaveConsumer(newValue -> setConfigValue("water_color", newValue))
                 .setTooltip(Text.translatable("tooltip.ghost.water"))
-                .build());
-        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.waterfog"), Config.waterfog)
-                .setSaveConsumer(newValue -> Config.waterfog = newValue)
+                .build()
+        );
+        world.addEntry(entryBuilder.startColorField(Text.translatable("entry.ghost.waterfog"), getConfigValueInt("water_fog_color"))
+                .setSaveConsumer(newValue -> setConfigValue("water_fog_color", newValue))
                 .setTooltip(Text.translatable("tooltip.ghost.waterfog"))
-                .build());
-        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), Config.time, -1 , 24000)
+                .build()
+        );
+        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), getConfigValueInt("time"), -1 , 24000)
                 .setDefaultValue(0)
                 .setMin(-1)
                 .setMax(24000)
                 .setTooltip(Text.translatable("tooltip.ghost.time"))
-                .setSaveConsumer(newValue -> Config.time = newValue)
+                .setSaveConsumer(newValue -> setConfigValue("time", newValue))
                 .build()
         );
-        general.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.version"), Config.version)
-                .setSaveConsumer(newValue -> Config.version = newValue)
-                .build());
-        general.addEntry(entryBuilder.startIntField(Text.translatable("entry.ghost.distance"), Config.distance)
-                .setSaveConsumer(newValue -> Config.distance = newValue)
-                .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.durability"), Config.durability)
-                .setSaveConsumer((newValue) -> Config.durability = newValue)
-                .build());
-        if(Config.durability) {
-            general.addEntry(entryBuilder.startDoubleField(Text.translatable("entry.ghost.durability_percentage"), Config.durability_percentage)
-                .setSaveConsumer(newValue -> Config.durability_percentage = newValue)
-                .setMin(0)
-                .setMax(100)
-                .build());
-        }
+        // -- Presets
         world.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.world_presets")).build());
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.plains_color")).setOnPress(button -> {
-            Config.grass = 0x7aca60;
-            config.grass = 0x7aca60;
+            setConfigValue("grass_color", 0x7aca60);
             MinecraftClient.getInstance().setScreen(null);
             save();
         }).build());
 
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.ocean_color")).setOnPress(button -> {
-            Config.water = 0x00ccaa;
-            config.water = 0x00ccaa;
-            Config.waterfog = 0x00ccaa;
-            config.waterfog = 0x00ccaa;
+            setConfigValue("water_color", 0x00ccaa);
+            setConfigValue("water_fog_color", 0x00ccaa);
             MinecraftClient.getInstance().setScreen(null);
             save();
         }).build());
 
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.jungle_color")).setOnPress(button -> {
-            Config.grass = 0x40cf00;
-            config.grass = 0x40cf00;
-            Config.leaf = 0x40cf00;
-            config.leaf = 0x40cf00;
+            setConfigValue("foliage_color", 0x40cf00);
+            setConfigValue("grass_color", 0x40cf00);
             MinecraftClient.getInstance().setScreen(null);
             save();
         }).build());
         //12700
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.sunset")).setOnPress(button -> {
-            Config.time = 12700;
-            config.time = 12700;
+            setConfigValue("time", 12700);
             MinecraftClient.getInstance().setScreen(null);
             save();
         }).build());
-        texture.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.moleman")).setOnPress(button -> {
-            Config.render_arms = false;
-            Config.render_legs = false;
-            Config.render_body = false;
-            Config.render_head = true;
-            Config.model_offset = -1.4f;
-            config.render_arms = false;
-            config.render_legs = false;
-            config.render_body = false;
-            config.render_head = true;
-            config.model_offset = -1.4f;
-            MinecraftClient.getInstance().setScreen(null);
-            save();
-        }).build());
-        //Build
-        return builder;
     }
-    public static class SerializedConfig
-    {
-        public String block;
-        public boolean is_slippery;
-        public String camera_type;
-        public int camera_distance;
-        public String player_texture;
-        public boolean is_sleeve;
-        public boolean in_portal;
-        public String in_snow;
-        public String title;
-        public Integer biomecolor;
-        public Integer fog;
-        public boolean is_cyrus_mode;
-        public Integer time;
-        public Integer leaf;
-        public Integer grass;
-        public String weather;
-        public boolean render_arms;
-        public boolean render_legs;
-        public boolean render_body;
-        public boolean render_head;
-        public boolean technoblade;
-        public boolean bouncy;
-        public boolean antfarm;
-        public float model_offset;
-        public Integer water;
-        public Integer waterfog;
-        public String version;
-        public int distance;
 
-        public int zoom_strength;
-        public boolean durability;
-        public double durability_percentage;
+    static void GenerateGamemodes(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
+        ConfigCategory gamemodes = builder.getOrCreateCategory(Text.translatable("config_category.ghost.gamemodes"));
 
-        public SerializedConfig()
-        {
-            this.block = Config.block;
-            this.is_slippery = Config.is_slippery;
-            this.camera_type = Config.camera_type;
-            this.camera_distance = Config.camera_distance;
-            this.player_texture = Config.player_texture;
-            this.is_sleeve = Config.is_sleeve;
-            this.in_snow = Config.inPowderSnowEffect;
-            this.in_portal = Config.inNetherPortalEffect;
-            this.title = Config.title;
-            this.biomecolor = Config.color;
-            this.fog = Config.fog;
-            this.is_cyrus_mode = Config.is_cyrus_mode;
-            this.time = Config.time;
-            this.leaf = Config.leaf;
-            this.grass = Config.grass;
-            this.weather = Config.weather;
-            this.zoom_strength = Config.zoom_strength;
-            this.render_arms = Config.render_arms;
-            this.render_legs = Config.render_legs;
-            this.render_body = Config.render_body;
-            this.render_head = Config.render_head;
-            this.model_offset = Config.model_offset;
-            this.water = Config.water;
-            this.waterfog = Config.waterfog;
-            this.version = Config.version;
-            this.distance = Config.distance;
-            this.bouncy = Config.bouncy;
-            this.antfarm = Config.antfarm;
-            this.technoblade = Config.technoblade;
-            this.durability = Config.durability;
-            this.durability_percentage = Config.durability_percentage;
-        }
-        public String serialized(){
-            return new Gson().toJson(this);
-        }
+        final String[] camera_modes = {
+                "normal",
+                "topdown",
+                "choppy"
+        };
+
+        gamemodes.addEntry(entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.camera_type"), getConfigValueString("camera_type"))
+                .setSelections(Arrays.asList(camera_modes))
+                .setSuggestionMode(false)
+                .setSaveConsumer(newValue -> setConfigValue("camera_type", newValue))
+                .build()
+        );
+    }
+
+    public static ConfigBuilder GenerateConfig() {
+        ConfigBuilder builder = ConfigBuilder.create()
+                .setParentScreen(MinecraftClient.getInstance().currentScreen)
+                .setTitle(Text.translatable("title.ghost.config"))
+                .setSavingRunnable(Config::save);
+        ConfigEntryBuilder entryBuilder = builder.entryBuilder();
+
+        GenerateGeneral(builder, entryBuilder);
+        GenerateVisuals(builder, entryBuilder);
+        GenerateWorld(builder, entryBuilder);
+        GenerateGamemodes(builder, entryBuilder);
+
+        return builder;
     }
 }

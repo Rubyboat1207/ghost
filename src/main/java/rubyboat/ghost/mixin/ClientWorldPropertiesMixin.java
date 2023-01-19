@@ -11,8 +11,8 @@ import rubyboat.ghost.config.Config;
 public class ClientWorldPropertiesMixin {
     @Inject(at = @At("HEAD"), method = "getTimeOfDay", cancellable = true)
     public void tick(CallbackInfoReturnable<Long> cir) {
-        if(Config.time() != -1){
-            cir.setReturnValue(Long.valueOf(Config.time()));
+        if(Config.getConfigValueInt("time") != -1){
+            cir.setReturnValue(Long.valueOf("" + Config.getConfigValueInt("time")));
         }
     }
 }

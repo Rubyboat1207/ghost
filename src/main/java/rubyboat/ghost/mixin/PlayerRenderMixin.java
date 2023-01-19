@@ -25,19 +25,23 @@ public abstract class PlayerRenderMixin {
 
     @Inject(at = @At("HEAD"), method = "getTexture(Lnet/minecraft/client/network/AbstractClientPlayerEntity;)Lnet/minecraft/util/Identifier;", cancellable = true)
     public void getTexture(AbstractClientPlayerEntity abstractClientPlayerEntity, CallbackInfoReturnable<Identifier> cir) {
-        if(!Config.getPlayerTexture().equals("")){
-            cir.setReturnValue(new Identifier("textures/" + Config.getPlayerTexture() + ".png"));
+        var tex = Config.getConfigValueString("player_texture");
+
+        if(!tex.equals("")){
+            cir.setReturnValue(new Identifier("textures/" + tex + ".png"));
         }
     }
 
     @Inject(at = @At("RETURN"), method = "getPositionOffset(Lnet/minecraft/client/network/AbstractClientPlayerEntity;F)Lnet/minecraft/util/math/Vec3d;", cancellable = true)
     public void getTexture(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, CallbackInfoReturnable<Vec3d> cir) {
-        cir.setReturnValue(cir.getReturnValue().add(0, Config.getModelOffset(), 0));
+        cir.setReturnValue(cir.getReturnValue().add(0, Config.getConfigValueFloat("model_offset"), 0));
     }
 
     @Inject(at = @At("HEAD"), method = "renderArm", cancellable = true)
     private void renderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity player, ModelPart arm, ModelPart sleeve, CallbackInfo ci) {
-        if(!Config.getPlayerTexture().equalsIgnoreCase("")){
+        var tex = Config.getConfigValueString("player_texture");
+
+        if(!tex.equalsIgnoreCase("")){
             PlayerEntityModel<AbstractClientPlayerEntity> playerEntityModel = ((PlayerEntityRenderer)(Object)this).getModel();
             this.setModelPose(player);
             playerEntityModel.handSwingProgress = 0.0F;
@@ -45,10 +49,10 @@ public abstract class PlayerRenderMixin {
             playerEntityModel.leaningPitch = 0.0F;
             playerEntityModel.setAngles(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
             arm.pitch = 0.0F;
-            arm.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntitySolid(new Identifier("textures/" + Config.getPlayerTexture() + ".png"))), light, OverlayTexture.DEFAULT_UV);
+            arm.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntitySolid(new Identifier("textures/" + tex + ".png"))), light, OverlayTexture.DEFAULT_UV);
             sleeve.pitch = 0.0F;
-            if(Config.isSleeve()){
-                sleeve.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(new Identifier("textures/" + Config.getPlayerTexture() + ".png"))), light, OverlayTexture.DEFAULT_UV);
+            if(Config.getConfigValueBoolean("sleeve_visibility")){
+                sleeve.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(new Identifier("textures/" + tex + ".png"))), light, OverlayTexture.DEFAULT_UV);
             }
             ci.cancel();
         }
@@ -57,7 +61,7 @@ public abstract class PlayerRenderMixin {
     private void renderArm(AbstractClientPlayerEntity player, CallbackInfo ci) {
         PlayerEntityModel<AbstractClientPlayerEntity> playerEntityModel = (PlayerEntityModel)(((PlayerEntityRenderer)(Object)this).getModel());
         //-----arms
-        if(!Config.isRender_arms())
+        if(!Config.getConfigValueBoolean("render_arms"))
         {
             playerEntityModel.leftSleeve.visible = false;
             playerEntityModel.rightSleeve.visible = false;
@@ -65,13 +69,13 @@ public abstract class PlayerRenderMixin {
             playerEntityModel.leftArm.visible = false;
         }
         //-----body
-        if(!Config.isRender_body())
+        if(!Config.getConfigValueBoolean("render_body"))
         {
             playerEntityModel.body.visible = false;
             playerEntityModel.jacket.visible = false;
         }
         //-----legs
-        if(!Config.isRender_legs())
+        if(!Config.getConfigValueBoolean("render_legs"))
         {
             playerEntityModel.leftLeg.visible = false;
             playerEntityModel.rightLeg.visible = false;
@@ -79,7 +83,7 @@ public abstract class PlayerRenderMixin {
             playerEntityModel.rightPants.visible = false;
         }
         //----head
-        if(!Config.isRender_head())
+        if(!Config.getConfigValueBoolean("render_head"))
         {
             playerEntityModel.head.visible = false;
             playerEntityModel.hat.visible = false;

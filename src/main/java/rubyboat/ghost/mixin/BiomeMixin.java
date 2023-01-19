@@ -16,39 +16,39 @@ public abstract class BiomeMixin {
 
     @Inject(at = @At("HEAD"), method = "getSkyColor", cancellable = true)
     public void getSkyColor(CallbackInfoReturnable<Integer> cir) {
-        if(!Config.color().equals(000000)){
-            cir.setReturnValue(Config.color()); // + Config.color()
+        if(Config.getConfigValueInt("sky_color") != 0) {
+            cir.setReturnValue(Config.getConfigValueInt("sky_color"));
         }
     }
     @Inject(at = @At("HEAD"), method = "getFogColor", cancellable = true)
     public void getFogColor(CallbackInfoReturnable<Integer> cir){
-        if(!Config.color().equals(000000)){
-            cir.setReturnValue(Config.fog()); // + Config.fog()
+        if(Config.getConfigValueInt("fogColor") != 0) {
+            cir.setReturnValue(Config.getConfigValueInt("fog_color")); // + Config.fog()
         }
     }
     @Inject(at = @At("HEAD"), method = "getFoliageColor", cancellable = true)
     public void getFoliageColor(CallbackInfoReturnable<Integer> cir){
-        if(!Config.leaf().equals(000000)){
-            cir.setReturnValue(Config.leaf());
+        if(Config.getConfigValueInt("foliage_color") != 0) {
+            cir.setReturnValue(Config.getConfigValueInt("foliage_color"));
         }
     }
     @Inject(at = @At("HEAD"), method = "getGrassColorAt", cancellable = true)
     public void getGrassColorAt(double x, double z, CallbackInfoReturnable<Integer> cir){
-        if(!Config.grass().equals(000000)){
-            cir.setReturnValue(Config.grass());
+        if(Config.getConfigValueInt("grass_color") != 0) {
+            cir.setReturnValue(Config.getConfigValueInt("grass_color"));
 
         }
     }
     @Inject(at = @At("HEAD"), method = "getWaterColor", cancellable = true)
     public void getWaterColor(CallbackInfoReturnable<Integer> cir){
-        if(!Config.water().equals(000000)){
-            cir.setReturnValue(Config.water());
+        if(Config.getConfigValueInt("water_color") != 0) {
+            cir.setReturnValue(Config.getConfigValueInt("water_color"));
         }
     }
     @Inject(at = @At("HEAD"), method = "getWaterFogColor", cancellable = true)
     public void getWaterFogColor(CallbackInfoReturnable<Integer> cir){
-        if(!Config.waterfog().equals(000000)){
-            cir.setReturnValue(Config.waterfog());
+        if(Config.getConfigValueInt("water_fog_color") != 0) {
+            cir.setReturnValue(Config.getConfigValueInt("water_fog_color"));
         }
     }
 

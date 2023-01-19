@@ -13,7 +13,7 @@ import rubyboat.ghost.config.Config;
 public class PigEntityModelMixin {
     @Inject(at = @At("HEAD"), method = "getTexturedModelData", cancellable = true)
     private static void getTexture(Dilation dilation, CallbackInfoReturnable<TexturedModelData> cir) {
-        if(!Config.isTechnoblade()) {
+        if(!Config.getConfigValueBoolean("technoblade")) {
             ModelData modelData = QuadrupedEntityModel.getModelData(6, dilation);
             ModelPartData modelPartData = modelData.getRoot();
             modelPartData.addChild("head", ModelPartBuilder.create().

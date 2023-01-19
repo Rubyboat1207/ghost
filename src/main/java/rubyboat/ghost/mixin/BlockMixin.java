@@ -22,7 +22,7 @@ public class BlockMixin {
     @Inject(at = @At("HEAD"), method = "getSlipperiness", cancellable = true)
     public void tick(CallbackInfoReturnable<Float> cir)
     {
-        if(Config.isSlippery())
+        if(Config.getConfigValueBoolean("frozen"))
         {
             if(MinecraftClient.getInstance().player != null)
             {
@@ -46,7 +46,7 @@ public class BlockMixin {
     @Inject(at = @At("HEAD"), method = "onEntityLand", cancellable = true)
     public void onLandedUpon(BlockView world, Entity entity, CallbackInfo ci)
     {
-        if (!entity.bypassesLandingEffects() && Config.getBouncy()) {
+        if (!entity.bypassesLandingEffects() && Config.getConfigValueBoolean("bouncy")) {
             this.bounce(entity);
             ci.cancel();
         }

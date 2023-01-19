@@ -31,8 +31,8 @@ public abstract class DebugHudMixin {
             )
     )
     Object[] DisableYNegativesOnXYZ(Object[] args) {
-        if(Config.disableNegatives()) {
-            args[1] = (double) args[1] + 64;
+        if(Config.getConfigValueBoolean("disable_negatives")) {
+            args[1] = (double) args[1] + getAddition();
         }
         return args;
     }
@@ -52,13 +52,13 @@ public abstract class DebugHudMixin {
         )
     )
     Object[] DisableYNegativesOnBlock(Object[] args) {
-        if(Config.disableNegatives()) {
-            args[1] = (int) args[1] + 64;
+        if(Config.getConfigValueBoolean("disable_negatives")) {
+            args[1] = (int) args[1] + getAddition();
         }
         return args;
     }
 
     int getAddition() {
-        return Math.abs(MinecraftClient.getInstance().player.getWorld().getDimension().minY()) ;
+        return Math.abs(MinecraftClient.getInstance().player.getWorld().getDimension().minY());
     }
 }

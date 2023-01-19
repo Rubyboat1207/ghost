@@ -5,7 +5,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.Nullable;
@@ -30,39 +29,41 @@ public abstract class MinecraftClientMixin {
     public void tick(CallbackInfo ci){
         if(GhostClient.keyBinding2.isPressed())
         {
-            MinecraftClient.getInstance().setScreen(Config.MakeConfig().build());
+            MinecraftClient.getInstance().setScreen(Config.GenerateConfig().build());
         }
     }
     @Inject(at = @At("HEAD"), method = "getWindowTitle", cancellable = true)
     public void getWindowTitle(CallbackInfoReturnable<String> cir){
-        if(!Config.getTitle().equalsIgnoreCase("")){
-            cir.setReturnValue(Config.getTitle());
+        var title = Config.getConfigValueString("title");
+        if(!title.equalsIgnoreCase("")){
+            cir.setReturnValue(title);
         }
     }
     @Inject(at = @At("HEAD"), method = "getGameVersion", cancellable = true)
     public void getGameVersion(CallbackInfoReturnable<String> cir){
-        if(!Config.getVersion().equalsIgnoreCase("")){
-            cir.setReturnValue(Config.getVersion());
+        var version = Config.getConfigValueString("version");
+        if(!version.equalsIgnoreCase("")){
+            cir.setReturnValue(version);
         }
     }
     @Inject(at = @At("HEAD"), method = "getVersionType", cancellable = true)
     public void getVersionType(CallbackInfoReturnable<String> cir){
-        if(!Config.getVersion().equalsIgnoreCase("")){
-            cir.setReturnValue(Config.getVersion());
+        var version = Config.getConfigValueString("version");
+        if(!version.equalsIgnoreCase("")){
+            cir.setReturnValue(version);
         }
     }
 
     @Inject(at = @At("HEAD"), method = "handleBlockBreaking", cancellable = true)
     public void cancelBlockBreaking(boolean breaking, CallbackInfo ci) {
-        if (Config.getDurability() && breaking) {
+        if (Config.getConfigValueBoolean("durability") && breaking) {
             ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
             int remaining = stack.getMaxDamage() - stack.getDamage();
             double percent = (double) remaining / (double) stack.getMaxDamage();
-            if(percent <= Config.getDurabilityPercentage()) {
+            if(percent <= ((float) Config.getConfigValueInt("durability") / 100)) {
                 this.interactionManager.cancelBlockBreaking();
                 ci.cancel();
             }
         }
     }
-
 }

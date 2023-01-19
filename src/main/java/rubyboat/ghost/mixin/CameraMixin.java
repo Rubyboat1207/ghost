@@ -51,43 +51,45 @@ public abstract class CameraMixin {
         this.area = area;
         this.focusedEntity = focusedEntity;
         this.thirdPerson = thirdPerson;
-        if(Config.getCamera_type().equalsIgnoreCase("normal") || Config.getCamera_type().equalsIgnoreCase("choppy"))
+        String camType = Config.getConfigValueString("camera_type");
+        var distance = Config.getConfigValueFloat("camera_distance");
+        if(camType.equalsIgnoreCase("normal") || camType.equalsIgnoreCase("choppy"))
         {
-            if(!Config.getCamera_type().equalsIgnoreCase("choppy"))
+            if(!camType.equalsIgnoreCase("choppy"))
             {
-                this.setRotation(Config.isAntfarm() ? 90 : focusedEntity.getYaw(tickDelta), Config.isAntfarm() ? 0 : focusedEntity.getPitch(tickDelta));
-                this.setPos(MathHelper.lerp((double)tickDelta, Config.isAntfarm() ? focusedEntity.getX() + 3  : focusedEntity.prevX, Config.isAntfarm() ? focusedEntity.getX() + 3  : focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) + (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
+                this.setRotation(focusedEntity.getYaw(tickDelta), focusedEntity.getPitch(tickDelta));
+                this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) + (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
             }else
             {
-                this.setRotation(Config.isAntfarm() ? 0 : focusedEntity.getYaw(), Config.isAntfarm() ? 0 : focusedEntity.getPitch());
-                this.setPos(Config.isAntfarm() ? focusedEntity.getX() + 3 : focusedEntity.getX(), focusedEntity.prevY + this.cameraY, focusedEntity.getZ());
+                this.setRotation(focusedEntity.getYaw(), focusedEntity.getPitch());
+                this.setPos(focusedEntity.getX(), focusedEntity.prevY + this.cameraY, focusedEntity.getZ());
             }
             if (thirdPerson) {
                 if (inverseView) {
                     this.setRotation(this.yaw + 180.0f, -this.pitch);
                 }
-
-                this.moveBy(-this.clipToSpace(Config.getDistance()), 0.0, 0.0);
+                this.moveBy(-this.clipToSpace(distance), 0.0, 0.0);
             } else if (focusedEntity instanceof LivingEntity && ((LivingEntity)focusedEntity).isSleeping()) {
                 Direction direction = ((LivingEntity)focusedEntity).getSleepingDirection();
                 this.setRotation(direction != null ? direction.asRotation() - 180.0f : 0.0f, 0.0f);
                 this.moveBy(0.0, 0.3, 0.0);
             }
-        }else if(Config.getCamera_type().equalsIgnoreCase("topDown"))
+        }else if(camType.equalsIgnoreCase("topDown"))
         {
             this.thirdPerson = true;
             this.setRotation(focusedEntity.getYaw(), 90);
-            this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY + Config.getCameraDistance(), focusedEntity.getY() + Config.getCameraDistance()), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
+            this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY + distance, focusedEntity.getY() + distance), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
         }
         ci.cancel();
     }
     @Inject(at = @At("HEAD"), method = "getSubmersionType", cancellable = true)
     public void getSubmersionType(CallbackInfoReturnable<CameraSubmersionType> cir){
-        if(Config.getInPowderSnowEffect().equalsIgnoreCase("snow")){
+        var hud_effect = Config.getConfigValueString("hud_effect");
+        if(hud_effect.equalsIgnoreCase("snow")){
             cir.setReturnValue(CameraSubmersionType.POWDER_SNOW);
-        }else if(Config.getInPowderSnowEffect().equalsIgnoreCase("lava")){
+        }else if(hud_effect.equalsIgnoreCase("lava")){
             cir.setReturnValue(CameraSubmersionType.LAVA);
-        }else if(Config.getInPowderSnowEffect().equalsIgnoreCase("water")) {
+        }else if(hud_effect.equalsIgnoreCase("water")) {
             cir.setReturnValue(CameraSubmersionType.WATER);
         }
 

@@ -1,7 +1,6 @@
 package rubyboat.ghost.mixin;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.DirectConnectScreen;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
@@ -20,11 +19,11 @@ public abstract class InteractionManagerMixin {
 
     @Inject(at = @At("HEAD"), method = "attackBlock", cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (Config.getDurability()) {
+        if (Config.getConfigValueBoolean("durability")) {
             ItemStack stack = MinecraftClient.getInstance().player.getStackInHand(Hand.MAIN_HAND);
             int remaining = stack.getMaxDamage() - stack.getDamage();
             double percent = (double) remaining / (double) stack.getMaxDamage();
-            if(percent <= Config.getDurabilityPercentage()) {
+            if(percent <= Config.getConfigValueInt("durability_percentage") / 100.0) {
                 this.cancelBlockBreaking();
                 cir.setReturnValue(false);
                 cir.cancel();
