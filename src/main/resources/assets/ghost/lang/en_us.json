@@ -57,5 +57,6 @@
   "entry.ghost.jungle_color": "Grass Color Always Jungle",
   "entry.ghost.sunset": "Time always sunset",
   "entry.ghost.durability": "Stop breaking blocks when durability is below a certain percentage",
-  "entry.ghost.durability_percentage": "That certain percentage mentioned above"
+  "entry.ghost.durability_percentage": "That certain percentage mentioned above",
+  "label.ghost.model_visibility": "Model Visibility"
 }

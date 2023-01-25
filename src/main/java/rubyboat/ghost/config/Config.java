@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import rubyboat.clothconfigextensions.builders.ButtonBuilder;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -29,56 +31,116 @@ public class Config {
     };
 
     public static int getConfigValueInt(String path) {
-
-        try {
-            return getConfig().get(path).getAsInt();
-        }catch (Exception e){
-            //System.out.println("Failed to get config value for " + path);
-            return 0;
+        if(config == null) {
+            loadConfig();
         }
+        if (getConfig().get(path) == null) {
+            if(getFallbackConfig().get(path) == null) {
+                return 0;
+            }
+            return getFallbackConfig().get(path).getAsInt();
+        }
+        return getConfig().get(path).getAsInt();
     }
 
     public static double getConfigValueDouble(String path) {
+        if(config == null) {
+            loadConfig();
+        }
+        if (getConfig().get(path) == null) {
+            if(getFallbackConfig().get(path) == null) {
+                return 0;
+            }
+            return getFallbackConfig().get(path).getAsDouble();
+        }
         return getConfig().get(path).getAsDouble();
     }
 
     public static float getConfigValueFloat(String path) {
+        if(config == null) {
+            loadConfig();
+        }
         if (getConfig().get(path) == null) {
-            return 0;
+            if(getFallbackConfig().get(path) == null) {
+                return 0;
+            }
+            return getFallbackConfig().get(path).getAsFloat();
         }
         return getConfig().get(path).getAsFloat();
     }
 
     public static boolean getConfigValueBoolean(String path) {
+        if(config == null) {
+            loadConfig();
+        }
         if(getConfig().get(path) == null) {
-            return false;
+            if(getFallbackConfig().get(path) == null) {
+                return false;
+            }
+            return getFallbackConfig().get(path).getAsBoolean();
         }
         return getConfig().get(path).getAsBoolean();
     }
 
     public static String getConfigValueString(String path) {
+        if(config == null) {
+            loadConfig();
+        }
         if(getConfig().get(path) == null) {
-            return "";
+            if(getFallbackConfig().get(path) == null) {
+                return "";
+            }
+            return getFallbackConfig().get(path).getAsString();
         }
         return getConfig().get(path).getAsString();
     }
+    static boolean requestedReload = false;
+    static void onConfigValChanged(String path) {
+        if(Arrays.stream(requiresReload).toList().contains(path)) {
+            requestedReload = true;
+        }
+    }
 
     static void setConfigValue(String path, int value) {
+        if(getConfigValueInt(path) == value) {
+            return;
+        }
+        onConfigValChanged(path);
         getConfig().addProperty(path, value);
     }
 
     static void setConfigValue(String path, double value) {
+        if(getConfigValueDouble(path) == value) {
+            return;
+        }
+        onConfigValChanged(path);
         getConfig().addProperty(path, value);
     }
 
     static void setConfigValue(String path, boolean value) {
+        if(getConfigValueBoolean(path) == value) {
+            return;
+        }
+        onConfigValChanged(path);
         getConfig().addProperty(path, value);
     }
 
     static void setConfigValue(String path, String value) {
+        if(getConfigValueString(path).equals(value)) {
+            return;
+        }
+        onConfigValChanged(path);
         getConfig().addProperty(path, value);
     }
 
+    static final String[] requiresReload = {
+        "fog_color",
+        "grass_color",
+        "foliage_color",
+        "sky_color",
+        "water_color",
+        "water_fog_color"
+    };
     static JsonObject getFallbackConfig() {
         JsonObject fallback = new JsonObject();
 
@@ -109,6 +171,7 @@ public class Config {
         fallback.addProperty("render_arms", true);
         fallback.addProperty("render_body", true);
         fallback.addProperty("render_legs", true);
+        //fallback.addProperty("render_armor", true);
         fallback.addProperty("model_offset", 0);
         fallback.addProperty("technoblade", true);
 
@@ -144,13 +207,21 @@ public class Config {
         return config;
     }
 
+    public static void savePresets() {
+        ClothConfigScreen screen = (ClothConfigScreen) MinecraftClient.getInstance().currentScreen;
+        screen.saveAll(true);
+    }
+
     public static void save() {
-        save(true);
+        save(false);
+        if(requestedReload) {
+            reload();
+            requestedReload = false;
+        }
     }
     public static void save(boolean reload) {
         if(reload) {
-            MinecraftClient.getInstance().worldRenderer.reload();
-            MinecraftClient.getInstance().reloadResources();
+            reload();
         }
 
         try {
@@ -159,6 +230,11 @@ public class Config {
             e.printStackTrace();
         }
         loadConfig();
+    }
+
+    static void reload() {
+        MinecraftClient.getInstance().worldRenderer.reload();
+        MinecraftClient.getInstance().reloadResources();
     }
 
     static void GenerateGeneral(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
@@ -217,7 +293,7 @@ public class Config {
     }
 
     static void GenerateVisuals(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
-        ConfigCategory texture = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
+        ConfigCategory visuals = builder.getOrCreateCategory(Text.translatable("config_category.ghost.texture"));
 
         final String[] effects = {
                 "none",
@@ -226,49 +302,53 @@ public class Config {
                 "lava"
         };
 
-        texture.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.player_texture"), getConfigValueString("player_texture"))
+        visuals.addEntry(entryBuilder.startStrField(Text.translatable("entry.ghost.player_texture"), getConfigValueString("player_texture"))
             .setSaveConsumer(newValue -> setConfigValue("player_texture", newValue))
             .setTooltip(Text.translatable("tooltip.ghost.player_texture"))
             .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), getConfigValueBoolean("sleeve_visibility"))
+        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.is_sleeve"), getConfigValueBoolean("sleeve_visibility"))
                 .setSaveConsumer(newValue -> setConfigValue("sleeve_visibility", newValue))
                 .build()
         );
         // -- Hud Visual Effects
-        texture.addEntry(entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.snow"), getConfigValueString("hud_effect"))
+        visuals.addEntry(entryBuilder.startStringDropdownMenu(Text.translatable("entry.ghost.snow"), getConfigValueString("hud_effect"))
                 .setSelections(Arrays.asList(effects))
                 .setSuggestionMode(false)
                 .setSaveConsumer(newValue -> setConfigValue("hud_effect", newValue))
                 .build()
         );
         // -- Update Model Visibility
-        texture.addEntry(entryBuilder.startTextDescription(
+        visuals.addEntry(entryBuilder.startTextDescription(
             Text.translatable("label.ghost.model_visibility")).
             build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_arms"), getConfigValueBoolean("render_arms"))
+        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_arms"), getConfigValueBoolean("render_arms"))
             .setSaveConsumer(newValue -> setConfigValue("render_arms", newValue))
             .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_legs"), getConfigValueBoolean("render_legs"))
+        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_legs"), getConfigValueBoolean("render_legs"))
             .setSaveConsumer(newValue -> setConfigValue("render_legs", newValue))
             .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_body"), getConfigValueBoolean("render_body"))
+        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_body"), getConfigValueBoolean("render_body"))
             .setSaveConsumer(newValue -> setConfigValue("render_body", newValue))
             .build()
         );
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_head"), getConfigValueBoolean("render_head"))
-            .setSaveConsumer(newValue -> setConfigValue("render_head", newValue))
-            .build()
+        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_head"), getConfigValueBoolean("render_head"))
+                .setSaveConsumer(newValue -> setConfigValue("render_head", newValue))
+                .build()
         );
-        texture.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.model_offset"), getConfigValueFloat("model_offset"))
+//        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.render_armor"), getConfigValueBoolean("render_armor"))
+//                .setSaveConsumer(newValue -> setConfigValue("render_armor", newValue))
+//                .build()
+//        );
+        visuals.addEntry(entryBuilder.startFloatField(Text.translatable("entry.ghost.model_offset"), getConfigValueFloat("model_offset"))
             .setSaveConsumer(newValue -> setConfigValue("model_offset", newValue))
             .build()
         );
         // -- Other Entities
-        texture.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.technoblade"), getConfigValueBoolean("technoblade"))
+        visuals.addEntry(entryBuilder.startBooleanToggle(Text.translatable("entry.ghost.technoblade"), getConfigValueBoolean("technoblade"))
             .setSaveConsumer(newValue -> setConfigValue("technoblade", newValue))
             .setTooltip(Text.translatable("tooltip.ghost.technoblade"))
             .build()
@@ -322,28 +402,24 @@ public class Config {
         world.addEntry(entryBuilder.startTextDescription(Text.translatable("label.ghost.world_presets")).build());
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.plains_color")).setOnPress(button -> {
             setConfigValue("grass_color", 0x7aca60);
-            MinecraftClient.getInstance().setScreen(null);
-            save();
+            savePresets();
         }).build());
 
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.ocean_color")).setOnPress(button -> {
             setConfigValue("water_color", 0x00ccaa);
             setConfigValue("water_fog_color", 0x00ccaa);
-            MinecraftClient.getInstance().setScreen(null);
-            save();
+            savePresets();
         }).build());
 
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.jungle_color")).setOnPress(button -> {
             setConfigValue("foliage_color", 0x40cf00);
             setConfigValue("grass_color", 0x40cf00);
-            MinecraftClient.getInstance().setScreen(null);
-            save();
+            savePresets();
         }).build());
         //12700
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.sunset")).setOnPress(button -> {
             setConfigValue("time", 12700);
-            MinecraftClient.getInstance().setScreen(null);
-            save();
+            savePresets();
         }).build());
     }
 

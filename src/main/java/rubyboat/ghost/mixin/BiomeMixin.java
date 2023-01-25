@@ -22,7 +22,7 @@ public abstract class BiomeMixin {
     }
     @Inject(at = @At("HEAD"), method = "getFogColor", cancellable = true)
     public void getFogColor(CallbackInfoReturnable<Integer> cir){
-        if(Config.getConfigValueInt("fogColor") != 0) {
+        if(Config.getConfigValueInt("fog_color") != 0) {
             cir.setReturnValue(Config.getConfigValueInt("fog_color")); // + Config.fog()
         }
     }
