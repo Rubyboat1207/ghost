@@ -53,7 +53,7 @@ public abstract class CameraMixin {
         this.thirdPerson = thirdPerson;
         String camType = Config.getConfigValueString("camera_type");
         var distance = Config.getConfigValueFloat("camera_distance");
-        if(camType.equalsIgnoreCase("normal") || camType.equalsIgnoreCase("choppy"))
+        if(!camType.equalsIgnoreCase("topdown"))
         {
             if(!camType.equalsIgnoreCase("choppy"))
             {

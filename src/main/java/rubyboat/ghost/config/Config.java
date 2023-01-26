@@ -176,7 +176,7 @@ public class Config {
         fallback.addProperty("technoblade", true);
 
         // -- Gamemodes --
-        fallback.addProperty("camera_type", "none");
+        fallback.addProperty("camera_type", "normal");
 
         return fallback;
     }
