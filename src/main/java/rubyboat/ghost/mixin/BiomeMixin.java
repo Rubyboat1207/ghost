@@ -12,7 +12,6 @@ import rubyboat.ghost.config.Config;
 public abstract class BiomeMixin {
     @Shadow public abstract int getSkyColor();
 
-    @Shadow public abstract float getDownfall();
 
     @Inject(at = @At("HEAD"), method = "getSkyColor", cancellable = true)
     public void getSkyColor(CallbackInfoReturnable<Integer> cir) {
