@@ -1,7 +1,7 @@
 package rubyboat.ghost.mixin;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
@@ -25,8 +25,8 @@ public class DeathScreenMixin {
 
 
     @Inject(at = @At("RETURN"), method = "render", cancellable = true)
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         DeathScreen screen = ((DeathScreen)(Object)this);
-        DrawableHelper.drawCenteredTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("Your death has contributed " + number + " zepto seconds towards the heat death of the universe"), screen.width / 2, 115, 16777215);
+        context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("Your death has contributed " + number + " zepto seconds towards the heat death of the universe"), screen.width / 2, 115, 16777215);
     }
 }

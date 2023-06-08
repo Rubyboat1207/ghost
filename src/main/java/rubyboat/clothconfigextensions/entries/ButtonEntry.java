@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -54,8 +55,8 @@ public class ButtonEntry extends TooltipListEntry<Object> {
     }
 
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
-        super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
+    public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isHovered, float delta) {
+        super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
         if (this.savedWidth != entryWidth || this.savedX != x || this.savedY != y) {
             this.wrappedLines = this.textRenderer.wrapLines(this.buttonInnerText, entryWidth);
             this.savedWidth = entryWidth;
@@ -68,13 +69,13 @@ public class ButtonEntry extends TooltipListEntry<Object> {
 
         button.setX(getConfigScreen().width / 2 - button.getWidth() / 2);
         button.setY(y);
-        button.render(matrices, mouseX, mouseY, delta);
+        button.render(context, mouseX, mouseY, delta);
 
 
         Style style = this.getTextAt(mouseX, mouseY);
         AbstractConfigScreen configScreen = this.getConfigScreen();
         if (style != null && configScreen != null) {
-            configScreen.renderTextHoverEffect(matrices, style, mouseX, mouseY);
+            configScreen.hoveredElement(mouseX, mouseY);
         }
     }
 
