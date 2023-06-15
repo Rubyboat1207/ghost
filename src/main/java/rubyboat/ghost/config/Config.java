@@ -166,7 +166,7 @@ public class Config {
         fallback.addProperty("sky_color", 0);
         fallback.addProperty("water_color", 0);
         fallback.addProperty("water_fog_color", 0);
-        fallback.addProperty("time", 0);
+        fallback.addProperty("time", -1);
         fallback.addProperty("render_head", true);
         fallback.addProperty("render_arms", true);
         fallback.addProperty("render_body", true);

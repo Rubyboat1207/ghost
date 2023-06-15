@@ -60,7 +60,7 @@ public abstract class MinecraftClientMixin {
             ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
             int remaining = stack.getMaxDamage() - stack.getDamage();
             double percent = (double) remaining / (double) stack.getMaxDamage();
-            if(percent <= ((float) Config.getConfigValueInt("durability") / 100)) {
+            if(percent <= ((float) Config.getConfigValueInt("durability_percentage") / 100)) {
                 this.interactionManager.cancelBlockBreaking();
                 ci.cancel();
             }
