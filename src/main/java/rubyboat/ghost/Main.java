@@ -9,9 +9,7 @@ public class Main implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        System.out.println("test");
         ServerPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            System.out.println("sent allow midair blocks");
             NetworkHandler.sendAllowMidAirBlocks(handler.player, true);
         });
     }
