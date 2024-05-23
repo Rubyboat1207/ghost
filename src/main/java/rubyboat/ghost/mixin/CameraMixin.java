@@ -44,6 +44,8 @@ public abstract class CameraMixin {
 
     @Shadow protected abstract void setPos(double x, double y, double z);
 
+    @Shadow private float lastTickDelta;
+
     @Inject(at = @At("HEAD"), method = "update", cancellable = true)
     public void update(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci)
     {
@@ -51,36 +53,51 @@ public abstract class CameraMixin {
         this.area = area;
         this.focusedEntity = focusedEntity;
         this.thirdPerson = thirdPerson;
+        this.lastTickDelta = tickDelta;
+
         String camType = Config.getConfigValueString("camera_type");
         var distance = Config.getConfigValueFloat("camera_distance");
-        if(!camType.equalsIgnoreCase("topdown"))
-        {
-            if(!camType.equalsIgnoreCase("choppy"))
-            {
+
+        if (!camType.equalsIgnoreCase("topdown")) {
+            if (!camType.equalsIgnoreCase("choppy")) {
                 this.setRotation(focusedEntity.getYaw(tickDelta), focusedEntity.getPitch(tickDelta));
-                this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) + (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
-            }else
-            {
+                this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()),
+                        MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) +
+                                (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY),
+                        MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
+            } else {
                 this.setRotation(focusedEntity.getYaw(), focusedEntity.getPitch());
                 this.setPos(focusedEntity.getX(), focusedEntity.prevY + this.cameraY, focusedEntity.getZ());
             }
+
             if (thirdPerson) {
+                float f;
                 if (inverseView) {
                     this.setRotation(this.yaw + 180.0f, -this.pitch);
                 }
-                this.moveBy(-this.clipToSpace(distance), 0.0, 0.0);
+                if (focusedEntity instanceof LivingEntity) {
+                    LivingEntity livingEntity = (LivingEntity)focusedEntity;
+                    f = livingEntity.getScale();
+                } else {
+                    f = 1.0f;
+                }
+                float f2 = f;
+                this.moveBy(-this.clipToSpace(distance * f2), 0.0, 0.0);
             } else if (focusedEntity instanceof LivingEntity && ((LivingEntity)focusedEntity).isSleeping()) {
                 Direction direction = ((LivingEntity)focusedEntity).getSleepingDirection();
                 this.setRotation(direction != null ? direction.asRotation() - 180.0f : 0.0f, 0.0f);
                 this.moveBy(0.0, 0.3, 0.0);
             }
-        }else if(camType.equalsIgnoreCase("topDown"))
-        {
+        } else if (camType.equalsIgnoreCase("topDown")) {
             this.thirdPerson = true;
             this.setRotation(focusedEntity.getYaw(), 90);
-            this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY + distance, focusedEntity.getY() + distance), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
+            this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()),
+                    MathHelper.lerp((double)tickDelta, focusedEntity.prevY + distance, focusedEntity.getY() + distance),
+                    MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
         }
+
         ci.cancel();
+
     }
     @Inject(at = @At("HEAD"), method = "getSubmersionType", cancellable = true)
     public void getSubmersionType(CallbackInfoReturnable<CameraSubmersionType> cir){
