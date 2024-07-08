@@ -403,23 +403,29 @@ public class Config {
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.plains_color")).setOnPress(button -> {
             setConfigValue("grass_color", 0x7aca60);
             savePresets();
+            setConfigValue("grass_color", 0x7aca60);
         }).build());
 
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.ocean_color")).setOnPress(button -> {
             setConfigValue("water_color", 0x00ccaa);
             setConfigValue("water_fog_color", 0x00ccaa);
             savePresets();
+            setConfigValue("water_color", 0x00ccaa);
+            setConfigValue("water_fog_color", 0x00ccaa);
         }).build());
 
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.jungle_color")).setOnPress(button -> {
             setConfigValue("foliage_color", 0x40cf00);
             setConfigValue("grass_color", 0x40cf00);
             savePresets();
+            setConfigValue("foliage_color", 0x40cf00);
+            setConfigValue("grass_color", 0x40cf00);
         }).build());
         //12700
         world.addEntry(new ButtonBuilder(Text.of(UUID.randomUUID().toString()), Text.translatable("entry.ghost.sunset")).setOnPress(button -> {
             setConfigValue("time", 12700);
             savePresets();
+            setConfigValue("time", 12700);
         }).build());
     }
 

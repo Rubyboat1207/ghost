@@ -38,7 +38,7 @@ public abstract class ClientWorldMixin {
             if(client.player.isCreative() || (client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-1,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-2,0)).getBlock() != Blocks.AIR || client.player.getWorld().getBlockState(client.player.getBlockPos().add(0,-3,0)).getBlock() != Blocks.AIR))
             {
                 BlockPos suggestedBlockpos = this.client.player.getBlockPos().add(0,-1,0);
-                this.setBlockState(suggestedBlockpos, Registries.BLOCK.get(new Identifier("minecraft", Config.getConfigValueString("block"))).getDefaultState(), 0, 0);
+                this.setBlockState(suggestedBlockpos, Registries.BLOCK.get(Identifier.of("minecraft", Config.getConfigValueString("block"))).getDefaultState(), 0, 0);
             }
         }
     }

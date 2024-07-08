@@ -15,7 +15,7 @@ import rubyboat.ghost.Main;
 import rubyboat.ghost.client.GhostClient;
 
 public class NetworkHandler {
-    public static final Identifier ALLOW_MIDAIR_BLOCKS = new Identifier(Main.MOD_ID, "allow_midair_blocks");
+    public static final Identifier ALLOW_MIDAIR_BLOCKS = Identifier.of(Main.MOD_ID, "allow_midair_blocks");
 
 
     public static void registerS2CPackets() {
@@ -36,7 +36,7 @@ public class NetworkHandler {
 
 
     public record AllowMidairBlocksPayload(Boolean allowPlace) implements CustomPayload {
-        public static final Id<AllowMidairBlocksPayload> ID = CustomPayload.id(ALLOW_MIDAIR_BLOCKS.toString());
+        public static final Id<AllowMidairBlocksPayload> ID = CustomPayload.id(ALLOW_MIDAIR_BLOCKS.toString().replace(':', '_'));
         public static final PacketCodec<PacketByteBuf, AllowMidairBlocksPayload> CODEC = PacketCodec.tuple(PacketCodecs.BOOL, AllowMidairBlocksPayload::allowPlace, AllowMidairBlocksPayload::new);
 
         @Override

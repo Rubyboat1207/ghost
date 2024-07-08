@@ -28,7 +28,7 @@ public abstract class PlayerRenderMixin {
         var tex = Config.getConfigValueString("player_texture");
 
         if(!tex.equals("")){
-            cir.setReturnValue(new Identifier("textures/" + tex + ".png"));
+            cir.setReturnValue(Identifier.of("textures/" + tex + ".png"));
         }
     }
 
@@ -49,10 +49,10 @@ public abstract class PlayerRenderMixin {
             playerEntityModel.leaningPitch = 0.0F;
             playerEntityModel.setAngles(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
             arm.pitch = 0.0F;
-            arm.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntitySolid(new Identifier("textures/" + tex + ".png"))), light, OverlayTexture.DEFAULT_UV);
+            arm.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntitySolid(Identifier.of("textures/" + tex + ".png"))), light, OverlayTexture.DEFAULT_UV);
             sleeve.pitch = 0.0F;
             if(Config.getConfigValueBoolean("sleeve_visibility")){
-                sleeve.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(new Identifier("textures/" + tex + ".png"))), light, OverlayTexture.DEFAULT_UV);
+                sleeve.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(Identifier.of("textures/" + tex + ".png"))), light, OverlayTexture.DEFAULT_UV);
             }
             ci.cancel();
         }
