@@ -77,7 +77,7 @@ public abstract class CameraMixin {
                 }
                 if (focusedEntity instanceof LivingEntity) {
                     LivingEntity livingEntity = (LivingEntity)focusedEntity;
-                    f = livingEntity.getScale();
+                    f = livingEntity.getScaleFactor();
                 } else {
                     f = 1.0f;
                 }
