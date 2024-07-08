@@ -1,9 +1,9 @@
 package rubyboat.ghost.mixin;
 
 import net.minecraft.client.gui.hud.DebugHud;
-import net.minecraft.client.gui.screen.ConnectScreen;
-import net.minecraft.client.gui.screen.DirectConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
@@ -40,7 +40,7 @@ public class DirectConnectScreenMixin extends Screen {
                 }
             } catch (Exception ignore) {}
 
-            ServerInfo entry = new ServerInfo("Random Server", ip, false);
+            ServerInfo entry = new ServerInfo("Random Server", ip, ServerInfo.ServerType.OTHER);
 
             assert this.client != null;
             ConnectScreen.connect(this, this.client, ServerAddress.parse(entry.address), entry, true);
