@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import rubyboat.clothconfigextensions.builders.ButtonBuilder;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +21,8 @@ import java.util.UUID;
 
 public class Config {
     static JsonObject config;
-    static String path = "ghost_config.json";
+    static String configFilePath = "ghost_config.json";
+    static String configFolderPath = "config";
 
     public static String[] downfall = {
             "none",
@@ -182,22 +184,50 @@ public class Config {
     }
 
     static void loadConfig() {
-        File file = new File(path);
+        Path fullFilePath = Paths.get(configFolderPath, configFilePath);
+        Path rootFilePath = Paths.get(configFilePath);
+
         String fromfile = "";
-        try{
-            fromfile = Files.readString(Path.of(path));
-        }catch (Exception e)
-        {
-            try{
-                Files.writeString(Path.of(path), getFallbackConfig().toString());
-                fromfile = Files.readString(Path.of(path));
-            }catch (Exception ignored) {
+
+        try {
+            // Check if the full configuration file exists
+            if (Files.exists(fullFilePath)) {
+                fromfile = Files.readString(fullFilePath);
+            }
+            // If the full configuration file does not exist, check if the root configuration file exists
+            else if (Files.exists(rootFilePath)) {
+                fromfile = Files.readString(rootFilePath);
+                Files.createDirectories(fullFilePath.getParent());
+                Files.writeString(fullFilePath, fromfile);
+
+                Files.delete(rootFilePath);
+            }
+            // If neither file exists, create the full configuration file with fallback content
+            else {
+                Files.createDirectories(fullFilePath.getParent());
+                Files.writeString(fullFilePath, getFallbackConfig().toString());
+                fromfile = Files.readString(fullFilePath);
+            }
+
+            config = new Gson().fromJson(fromfile, JsonObject.class);
+
+        } catch (Exception e) {
+            // Print error message and stack trace if there was an error loading the configuration
+            System.err.println("Error loading configuration: " + e.getMessage());
+            e.printStackTrace();
+
+            try {
+                // Attempt to create fallback configuration if the initial attempt failed
+                Files.createDirectories(fullFilePath.getParent());
+                Files.writeString(fullFilePath, getFallbackConfig().toString());
+                fromfile = Files.readString(fullFilePath);
+                config = new Gson().fromJson(fromfile, JsonObject.class);
+            } catch (Exception innerException) {
+                System.err.println("Error creating fallback configuration file: " + innerException.getMessage());
+                innerException.printStackTrace();
                 config = getFallbackConfig();
-                System.out.println(config);
-                return;
             }
         }
-        config = new Gson().fromJson(fromfile, JsonObject.class);
     }
 
     static JsonObject getConfig() {
@@ -225,7 +255,7 @@ public class Config {
         }
 
         try {
-            Files.writeString(Path.of(path), config.toString());
+            Files.writeString(Path.of(configFolderPath, configFilePath), config.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -390,7 +420,7 @@ public class Config {
                 .setTooltip(Text.translatable("tooltip.ghost.waterfog"))
                 .build()
         );
-        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), getConfigValueInt("time"), -1 , 24000)
+        world.addEntry(entryBuilder.startIntSlider(Text.translatable("entry.ghost.time"), getConfigValueInt("time"), -1, 24000)
                 .setDefaultValue(0)
                 .setMin(-1)
                 .setMax(24000)
